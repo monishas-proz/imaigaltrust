@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Membership {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  dob                DateTime
+  email              String
+  mobile             String
+  address            String
+  city               String
+  pincode            String
+  state              String
+  membership_type    String
+  interest           String
+  membership_fee     String
+  voluntary_donation Decimal  @default(0.000000000000000000000000000000)
+  status             Int
+  is_active          Int
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  @@map("memberships")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   @default("admin")
+  is_active  Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("users")
+}
+
+model AnnualReport {
+  id         Int      @id @default(autoincrement())
+  type       String   @db.VarChar(50)
+  year       String   @db.VarChar(50)
+  language   String   @db.VarChar(50)
+  file_path  String   @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("annual_reports")
+}
+
+model GalleryCategory {
+  id         Int       @id @default(autoincrement())
+  category   String    @db.VarChar(255)
+  status     Int       @default(1)
+  created_at DateTime  @default(now())
+  events     Event[]
+  gallery    Gallery[]
+
+  @@map("gallery_category")
+}
+
+model GalleryProgram {
+  id         Int       @id @default(autoincrement())
+  programs   String    @db.VarChar(255)
+  status     Int       @default(1)
+  created_at DateTime  @default(now())
+  events     Event[]
+  gallery    Gallery[]
+
+  @@map("gallery_programs")
+}
+
+model Gallery {
+  id          Int             @id @default(autoincrement())
+  program_id  Int
+  category_id Int
+  year        String          @db.VarChar(10)
+  month       String?         @db.VarChar(20)
+  title       String          @db.VarChar(255)
+  media_type  String          @default("image")
+  description String?         @db.Text
+  file_path   String?         @db.VarChar(500)
+  video_url   String?         @db.VarChar(500)
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  status      Int             @default(1)
+  category    GalleryCategory @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  program     GalleryProgram  @relation(fields: [program_id], references: [id], onDelete: Cascade)
+
+  @@index([category_id], map: "gallery_category_id_fkey")
+  @@index([program_id], map: "gallery_program_id_fkey")
+  @@map("gallery")
+}
+
+model Event {
+  id                      Int                 @id @default(autoincrement())
+  title                   String              @db.VarChar(255)
+  program_id              Int
+  category_id             Int
+  status                  EventStatus
+  start_date              DateTime            @db.Date
+  start_time              DateTime            @db.Time(0)
+  end_date                DateTime?           @db.Date
+  end_time                DateTime?           @db.Time(0)
+  location                String              @db.VarChar(255)
+  short_description       String              @db.VarChar(255)
+  full_description        String?             @db.Text
+  contact_person          String?             @db.VarChar(150)
+  contact_email           String?             @db.VarChar(150)
+  video_url               String?             @db.VarChar(255)
+  cover_image             String?             @db.VarChar(255)
+  registration_start_date DateTime?           @db.Date
+  registration_end_date   DateTime?           @db.Date
+  is_draft                Boolean             @default(true)
+  created_at              DateTime            @default(now())
+  updated_at              DateTime            @updatedAt
+  status_active           Int                 @default(1)
+  registrations           EventRegistration[]
+  category                GalleryCategory     @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  program                 GalleryProgram      @relation(fields: [program_id], references: [id], onDelete: Cascade)
+
+  @@index([program_id])
+  @@index([category_id])
+  @@map("events")
+}
+
+model EventRegistration {
+  id                   Int                         @id @default(autoincrement())
+  event_id             Int
+  first_name           String                      @db.VarChar(100)
+  last_name            String                      @db.VarChar(100)
+  age                  Int
+  gender               event_registrations_gender?
+  email                String                      @db.VarChar(150)
+  phone                String                      @db.VarChar(20)
+  source               String?                     @db.VarChar(255)
+  motivation           String?                     @db.Text
+  special_requirements String?                     @db.Text
+  consent              Boolean                     @default(false)
+  created_at           DateTime?                   @default(now()) @db.Timestamp(0)
+  event                Event                       @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_registrations_ibfk_1")
+
+  @@index([event_id], map: "event_id")
+  @@map("event_registrations")
+}
+
+enum EventStatus {
+  upcoming
+  ongoing
+  past
+}
+
+enum event_registrations_gender {
+  male
+  female
+  other
+}

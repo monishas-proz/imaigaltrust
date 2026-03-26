@@ -1,0 +1,487 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  Users,
+  Calendar,
+  Mail,
+  Phone,
+  Clock,
+  User,
+  FileText,
+  AlertCircle,
+  Eye,
+  X,
+  Info,
+} from "lucide-react";
+
+interface Registration {
+  id: number;
+  first_name: string;
+  last_name: string;
+  age: number;
+  gender: string;
+  email: string;
+  phone: string;
+  source: string;
+  motivation: string;
+  special_requirements: string;
+  created_at: string;
+  cover_image: string | null;
+  registration_start_date: string | null;
+  registration_end_date: string | null;
+  event: {
+    title: string;
+    location: string;
+    cover_image: string | null;
+    start_date: string;
+    start_time: string;
+    end_date: string | null;
+    end_time: string | null;
+    registration_start_date: string | null;
+    registration_end_date: string | null;
+    program: {
+      programs: string;
+    };
+  };
+}
+export default function EventRegistrationsPage() {
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedReg, setSelectedReg] = useState<Registration | null>(null);
+
+  const fetchRegistrations = async () => {
+    try {
+      const searchParams =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search)
+          : new URLSearchParams();
+      const eventId = searchParams.get("eventId");
+      const url = eventId
+        ? `/api/events/register?eventId=${eventId}`
+        : "/api/events/register";
+
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.registrations) {
+        setRegistrations(data.registrations);
+      }
+    } catch (error) {
+      console.error("Error fetching registrations:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRegistrations();
+  }, []);
+
+  const eventInfo = registrations.length > 0 ? registrations[0].event : null;
+
+  return (
+    <div className="space-y-6">
+      {eventInfo && (
+        <div className="space-y-8">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm transition-all hover:shadow-md overflow-hidden">
+            <div className="flex flex-col md:flex-row">
+              {eventInfo.cover_image && (
+                <div className="w-full md:w-72 h-48 md:h-auto overflow-hidden shrink-0 border-r border-gray-100 italic relative">
+                  <Image
+                    src={eventInfo.cover_image}
+                    alt={eventInfo.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="flex-1 p-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
+                  <div className="col-span-2 lg:col-span-4 mb-2">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
+                      Event Name
+                    </p>
+                    <h1 className="text-3xl font-extrabold text-[#2d2a4a] tracking-tight">
+                      {eventInfo.title}
+                    </h1>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-2">
+                      Event Period
+                    </p>
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-gray-800 flex items-center gap-2">
+                        <Calendar size={12} className="text-[#1a4d2e]" />
+                        {new Date(eventInfo.start_date)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-")}
+                      </p>
+                      {eventInfo.end_date && (
+                        <p className="text-[11px] font-semibold text-gray-500 flex items-center gap-2">
+                          <Clock size={12} className="text-gray-300" />
+                          Ends:{" "}
+                          {new Date(eventInfo.end_date)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-2">
+                      Registration Dates
+                    </p>
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-gray-800 flex items-center gap-2">
+                        <FileText size={12} className="text-blue-500" />
+                        {eventInfo.registration_start_date
+                          ? new Date(eventInfo.registration_start_date)
+                              .toLocaleDateString("en-GB")
+                              .replace(/\//g, "-")
+                          : "Not set"}
+                      </p>
+                      {eventInfo.registration_end_date && (
+                        <p className="text-[11px] font-semibold text-red-500 flex items-center gap-2">
+                          <AlertCircle size={12} className="text-red-300" />
+                          Closes:{" "}
+                          {new Date(eventInfo.registration_end_date)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-2">
+                      Location / Venue
+                    </p>
+                    <p className="text-xs font-bold text-gray-800 flex items-start gap-2">
+                      <User
+                        size={12}
+                        className="text-[#1a4d2e] shrink-0 mt-0.5"
+                      />
+                      {eventInfo.location}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-2 text-right">
+                      Total Impact
+                    </p>
+                    <div className="text-right">
+                      <p className="text-2xl font-black text-[#1a4d2e]">
+                        {registrations.length}
+                      </p>
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                        REGISTERED PARTICIPANTS
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-gray-200">
+            <div className="flex gap-8">
+              <button className="px-4 py-3 text-[11px] font-black text-[#1a4d2e] border-b-2 border-[#1a4d2e] uppercase tracking-[0.1em]">
+                Registrations List
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mt-6 overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left border-collapse table-auto">
+            <thead className="bg-[#1a4d2e] text-white">
+              <tr>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10 w-[60px] text-center">
+                  S.No
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10">
+                  Name
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider text-center border-r border-white/10">
+                  Age
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider text-center border-r border-white/10">
+                  Gender
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10">
+                  Email
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10 text-center">
+                  Phone
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10 text-center">
+                  Start Date
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10 text-center">
+                  End Date
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10 text-center">
+                  Reg. Date
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider border-r border-white/10">
+                  Source
+                </th>
+                <th className="p-4 font-bold uppercase text-[10px] tracking-wider w-[80px] text-center">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={11}
+                    className="p-12 text-center text-gray-500 border-x border-gray-100"
+                  >
+                    <div className="flex justify-center items-center h-20">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a4d2e]"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : registrations.length > 0 ? (
+                registrations.map((reg, index) => (
+                  <tr
+                    key={reg.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="p-4 text-gray-500 font-medium text-xs border-r border-gray-100 text-center">
+                      {index + 1}
+                    </td>
+                    <td className="p-4 border-r border-gray-100">
+                      <div className="font-bold text-gray-900 text-xs text-nowrap">
+                        {reg.first_name} {reg.last_name}
+                      </div>
+                    </td>
+                    <td className="p-4 text-center border-r border-gray-100">
+                      <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-[10px] font-bold">
+                        {reg.age}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center border-r border-gray-100">
+                      <span className="text-gray-600 text-[10px] font-bold uppercase tracking-wider">
+                        {reg.gender}
+                      </span>
+                    </td>
+                    <td
+                      className="p-4 text-[#1a4d2e] font-semibold text-xs border-r border-gray-100 truncate max-w-[150px]"
+                      title={reg.email}
+                    >
+                      {reg.email}
+                    </td>
+                    <td className="p-4 text-gray-700 font-mono text-[11px] border-r border-gray-100 text-center">
+                      {reg.phone}
+                    </td>
+                    <td className="p-4 text-gray-600 text-[11px] whitespace-nowrap border-r border-gray-100 text-center font-medium">
+                      {new Date(reg.event.start_date)
+                        .toLocaleDateString("en-GB")
+                        .replace(/\//g, "-")}
+                    </td>
+                    <td className="p-4 text-gray-600 text-[11px] whitespace-nowrap border-r border-gray-100 text-center font-medium">
+                      {reg.event.end_date
+                        ? new Date(reg.event.end_date)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")
+                        : "-"}
+                    </td>
+                    <td className="p-4 text-gray-500 text-[11px] whitespace-nowrap border-r border-gray-100 text-center font-medium">
+                      {new Date(reg.created_at)
+                        .toLocaleDateString("en-GB")
+                        .replace(/\//g, "-")}
+                    </td>
+                    <td className="p-4 text-gray-600 text-[11px] italic whitespace-nowrap border-r border-gray-100">
+                      {reg.source || "-"}
+                    </td>
+                    <td className="p-4 text-center">
+                      <button
+                        onClick={() => setSelectedReg(reg)}
+                        className="p-2 hover:bg-[#1a4d2e]/10 text-[#1a4d2e] rounded-full transition-colors group"
+                        title="View Details"
+                      >
+                        <Eye
+                          size={18}
+                          className="group-hover:scale-110 transition-transform"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={11}
+                    className="p-12 text-center text-gray-500 border-x border-gray-100"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Users size={48} className="text-gray-200" />
+                      <p className="text-lg font-medium">
+                        No registrations yet
+                      </p>
+                      <p className="text-sm">
+                        When users register for events, they will appear here.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Detail Modal Overlay */}
+      {selectedReg && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
+        >
+          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 pointer-events-auto">
+            {/* Modal Header */}
+            <div className="bg-[#1a4d2e] p-6 text-white flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-xl">
+                  <User size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Registration Details</h3>
+                  <p className="text-white/70 text-xs font-medium uppercase tracking-wider">
+                    Registered on{" "}
+                    {new Date(selectedReg.created_at)
+                      .toLocaleDateString("en-GB")
+                      .replace(/\//g, "-")}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedReg(null)}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Personal Information */}
+                <div className="space-y-6">
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">
+                    Personal Information
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <DetailItem
+                      label="Full Name"
+                      value={`${selectedReg.first_name} ${selectedReg.last_name}`}
+                      icon={<User size={14} />}
+                    />
+                    <DetailItem
+                      label="Age"
+                      value={`${selectedReg.age} Years`}
+                    />
+                    <DetailItem label="Gender" value={selectedReg.gender} />
+                    <DetailItem
+                      label="Source"
+                      value={selectedReg.source || "-"}
+                    />
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-6">
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">
+                    Contact Details
+                  </h4>
+                  <div className="space-y-4">
+                    <DetailItem
+                      label="Email Address"
+                      value={selectedReg.email}
+                      icon={<Mail size={14} />}
+                      highlight
+                    />
+                    <DetailItem
+                      label="Phone Number"
+                      value={selectedReg.phone}
+                      icon={<Phone size={14} />}
+                    />
+                  </div>
+                </div>
+
+                {/* Additional Information */}
+                <div className="md:col-span-2 space-y-6 mt-2">
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">
+                    Participant Notes
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <Info size={12} className="text-[#1a4d2e]" />
+                        Motivation
+                      </p>
+                      <p className="text-sm text-gray-700 leading-relaxed italic">
+                        &quot;{selectedReg.motivation || "No motivation provided"}&quot;
+                      </p>
+                    </div>
+                    <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                      <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <AlertCircle size={12} className="text-red-500" />
+                        Special Requirements
+                      </p>
+                      <p className="text-sm text-red-700 leading-relaxed font-medium">
+                        {selectedReg.special_requirements || "None specified"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => setSelectedReg(null)}
+                className="px-6 py-2.5 bg-[#1a4d2e] text-white text-xs font-bold rounded-xl hover:bg-[#143d24] transition-all shadow-lg shadow-[#1a4d2e]/20"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DetailItem({
+  label,
+  value,
+  icon,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+        {label}
+      </p>
+      <div
+        className={`flex items-center gap-2 ${highlight ? "text-[#1a4d2e]" : "text-gray-800"}`}
+      >
+        {icon && <span className="opacity-50">{icon}</span>}
+        <p className="text-sm font-bold truncate">{value}</p>
+      </div>
+    </div>
+  );
+}

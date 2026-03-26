@@ -1,0 +1,16 @@
+.btns{
+    text-transform: uppercase;
+    font-family: var(--josefin-font);
+    text-align: center;
+    padding: 7px 8px 4px 8px;
+    cursor: pointer;
+
+}
+.blue__btn{
+    background-color: var(--accent-color-800);    
+    color:#fff;
+}
+.blue__btn:hover{
+    background-color: #162663;
+    color:#fff
+}

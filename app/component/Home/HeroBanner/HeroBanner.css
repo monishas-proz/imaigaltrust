@@ -1,0 +1,19 @@
+/* slick dots custom styling */
+.slick-dots {
+    bottom: 30px; /* distance from slider */
+  }
+  
+  .slick-dots li {
+    margin: 0 4px; /* spacing between dots */
+  }
+  
+  .slick-dots li button:before {
+    font-size: 12px; /* dot size */
+    color: #888;     /* default dot color */
+    opacity: 1;
+  }
+  
+  .slick-dots li.slick-active button:before {
+    color: var(--primary-color); /* active dot color */
+  }
+  

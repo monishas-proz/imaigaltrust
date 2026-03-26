@@ -1,0 +1,102 @@
+/* load Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap");
+
+/* helper class to force Poppins everywhere you need it */
+.font-poppins {
+  font-family: "Poppins", sans-serif !important;
+}
+
+.my-paragraph {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #101010;
+
+  /* push it down by 16px */
+  margin-top: 16px;
+}
+.my-paragraph {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #101010;
+}
+
+.force-line {
+  display: block;
+  /* optional: tweak spacing above the new line */
+  margin-top: 4px;
+}
+
+.my-paragraph {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #101010;
+}
+
+.force-line {
+  display: block;
+  /* optional: adjust this to control the gap above the new line */
+  margin-top: 4px;
+}
+.my-paragraph {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #101010;
+}
+
+.force-line {
+  display: block;
+  /* tweak spacing above the new line if needed */
+  margin-top: 4px;
+}
+.my-paragraphh {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #101010;
+  margin-top: 15px;
+}
+
+/* styles.css */
+
+/* 1) Make sure Poppins is loaded (in your HTML <head> or globals.css) */
+
+/* 2) Define a class for your heading */
+.sfurti-heading {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 36px;
+  /* Figma calls for 46px line-height, not 1px */
+  line-height: 46px;
+  letter-spacing: 0;
+  color: #101010;
+  margin: 0 0 32px; /* adds 32px below the heading */
+  /* remove any padding-bottom here */
+}
+
+/* your list that follows */
+.goals-list {
+  margin: 0; /* reset default ul margin */
+  padding: 0; /* reset default ul padding */
+  list-style: none; /* we’re using our own chevron bullets */
+}
+
+.goals-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px; /* the space between chevron and text */
+  margin-bottom: 16px; /* space between each row */
+}

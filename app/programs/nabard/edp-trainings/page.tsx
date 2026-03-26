@@ -1,0 +1,257 @@
+"use client";
+import React from "react";
+import PageBanner from "@/app/component/Banner/PageBanner/PageBanner";
+import Image from "next/image";
+import {
+  FaLightbulb,
+  FaBookOpen,
+  FaBuilding,
+  FaUsers,
+  FaChartPie,
+} from "react-icons/fa";
+
+export default function EDPTrainings() {
+  const objectives = [
+    {
+      icon: <FaUsers />,
+      text: "Promote entrepreneurship among rural youth and women",
+    },
+    {
+      icon: <FaLightbulb />,
+      text: "Encourage self-employment and small enterprise development",
+    },
+    {
+      icon: <FaBookOpen />,
+      text: "Build skills in business planning and management",
+    },
+    {
+      icon: <FaBuilding />,
+      text: "Support agri-based and rural enterprises",
+    },
+  ];
+
+  const activities = [
+    {
+      title: "Awareness Workshops",
+      desc: "Comprehensive sessions to inspire and inform potential entrepreneurs about local opportunities.",
+    },
+    {
+      title: "Business Training",
+      desc: "Direct training programs covering the essentials of starting and managing a small business.",
+    },
+    {
+      title: "Plan Preparation",
+      desc: "Professional guidance on drafting robust business plans and feasibility reports.",
+    },
+    {
+      title: "Financial Literacy",
+      desc: "Support for credit linkages and understanding government financial schemes.",
+    },
+  ];
+
+  return (
+    <div className="bg-white min-h-screen">
+      <PageBanner
+        title="EDP Trainings"
+        list={[
+          { id: 1, name: "Programs", link: "/" },
+          { id: 2, name: "EDP Trainings" },
+        ]}
+      />
+
+      <div className=" max-w-[1700px] mx-auto px-6 py-10 lg:px-16">
+        {/* Main Section - Reordered for better balance */}
+        <div className="grid lg:grid-cols-12 gap-12 items-center mb-20">
+          <div className="lg:col-span-7 space-y-6 inter-font order-2 lg:order-1 text-center lg:text-left">
+            <h2 className="josefin-font text-12px md:text-3xl font-bold text-[#1B2F7C] uppercase leading-tight tracking-tight">
+              Entrepreneurship Development Programme (EDP)
+            </h2>
+            {/* <div className="w-20 h-1.5 bg-[#1B2F7C] mx-auto lg:mx-0 rounded-full"></div> */}
+            <p className="text-black text-xl leading-relaxed font-semibold">
+              Empowering rural youth and women to transition from job seekers to
+              job creators.
+            </p>
+            <div className="space-y-6">
+              <p className="text-black text-sml leading-relaxed">
+                The Entrepreneurship Development Programme (EDP) conducted by{" "}
+                <strong className="primary-text">Imaigal Trust</strong> focuses
+                on building entrepreneurial skills among rural youth, women, and
+                aspiring agri-entrepreneurs.
+              </p>
+              <p className="text-black text-sml leading-relaxed">
+                Through EDP trainings, participants gain exposure to business
+                planning, financial management, market opportunities, and
+                government support schemes. The program aims to create
+                sustainable livelihood opportunities and strengthen rural
+                economies.
+              </p>
+            </div>
+          </div>
+          <div className="lg:col-span-5 order-1 lg:order-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="relative h-64 w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white transform hover:-translate-y-2 transition-transform duration-500">
+                  <Image
+                    src={`/assets/images/programs/edp(1).jpeg`}
+                    alt="EDP Training session 1"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="relative h-48 w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white transform hover:translate-x-2 transition-transform duration-500">
+                  <Image
+                    src={`/assets/images/programs/edp(2).jpeg`}
+                    alt="EDP Training session 2"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 pt-12">
+                <div className="relative h-48 w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white transform hover:-translate-x-2 transition-transform duration-500">
+                  <Image
+                    src={`/assets/images/programs/edp(3).jpeg`}
+                    alt="EDP Training session 3"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="relative h-64 w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white transform hover:translate-y-2 transition-transform duration-500">
+                  <Image
+                    src={`/assets/images/programs/edp(4).jpeg`}
+                    alt="EDP Training session 4"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Objectives Section */}
+        <div className="bg-secondary-50 rounded-3xl p-8 md:p-12 mb-20 shadow-sm border border-gray-100">
+          <h2 className="josefin-font text-3xl font-bold secondary-text-900 uppercase text-center mb-12">
+            Objectives
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {objectives.map((obj, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center text-center space-y-4"
+              >
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-green-700 text-2xl shadow-md border border-primary/10">
+                  {obj.icon}
+                </div>
+                <p className="inter-font font-medium text-gray-800 text-sm leading-snug">
+                  {obj.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Key Activities - Cleaner, more uniform grid */}
+        <div className="mb-20">
+          <h2 className="josefin-font text-3xl font-bold black-text uppercase text-center mb-12">
+            Key Activities
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activities.map((activity, index) => (
+              <div
+                key={index}
+                className="p-8 bg-white border-1 border-black rounded-3xl hover:border-primary/30 hover:shadow-xl transition-all duration-300 group flex flex-col h-full items-start"
+              >
+                <div className="mb-6 w-12 h-1 bg-primary/20 group-hover:w-full transition-all duration-500 rounded-full"></div>
+                <h3 className="josefin-font text-xl font-bold secondary-text-900 mb-4 uppercase tracking-wide">
+                  {activity.title}
+                </h3>
+                <p className="text-gray-600 inter-font text-sm leading-relaxed">
+                  {activity.desc}
+                </p>
+              </div>
+            ))}
+            {/* Uniform Activity Item for "Exposure visits" */}
+            <div className="p-8 bg-white border-1 border-black rounded-3xl hover:border-primary/30 hover:shadow-xl transition-all duration-300 group flex flex-col h-full items-start">
+              <div className="mb-6 w-12 h-1 bg-primary/20 group-hover:w-full transition-all duration-500 rounded-full"></div>
+              <h3 className="josefin-font text-xl font-bold secondary-text-900 mb-4 uppercase tracking-wide">
+                Exposure Visits
+              </h3>
+              <p className="text-gray-600 inter-font text-sm leading-relaxed">
+                Real-world exposure to successful enterprises and industry
+                leaders.
+              </p>
+            </div>
+            <div className="p-8 bg-white border-1 border-black rounded-3xl hover:border-primary/30 hover:shadow-xl transition-all duration-300 group flex flex-col h-full items-start">
+              <div className="mb-6 w-12 h-1 bg-primary/20 group-hover:w-full transition-all duration-500 rounded-full"></div>
+              <h3 className="josefin-font text-xl font-bold secondary-text-900 mb-4 uppercase tracking-wide">
+                Learning Visits
+              </h3>
+              <p className="text-gray-600 inter-font text-sm leading-relaxed">
+                Hands-on learning through visits to successful enterprises and
+                interactions with industry leaders.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Beneficiaries & Why Section - Balanced & Integrated */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-2">
+          <div className="bg-secondary-50 p-10 rounded-3xl border border-gray-100 flex flex-col justify-center">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center text-xl shadow-lg">
+                <FaUsers />
+              </div>
+              <h3 className="josefin-font text-2xl font-bold secondary-text-900 uppercase">
+                Beneficiaries
+              </h3>
+            </div>
+            <div className="grid gap-4">
+              {[
+                "Rural youth seeking self-employment",
+                "Aspiring women entrepreneurs",
+                "Farmers interested in agri-business",
+                "Small-scale business enthusiasts",
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center space-x-3 text-gray-700 inter-font bg-white/80 p-4 rounded-2xl border border-white shadow-sm"
+                >
+                  {/* <FaArrowRight className="text-primary text-xs shrink-0" /> */}
+                  <span className="h-[20px] mb-2 flex items-center text-green-600 text-[25px] leading-[24px]">
+                    &raquo;
+                  </span>
+                  <span className="text-base font-medium">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative rounded-3xl overflow-hidden bg-primary p-10 md:p-14 text-white flex flex-col justify-center shadow-xl">
+            <div className="relative z-10 space-y-6">
+              <h2 className="josefin-font text-3xl font-bold uppercase tracking-tight border-b border-white/20 pb-4">
+                Empowering Rural Livelihoods
+              </h2>
+              <p className="inter-font text-xl leading-relaxed font-light italic opacity-95">
+                &quot;Our Entrepreneurship Development Programme is designed not
+                just to teach business, but to ignite the spirit of innovation
+                in rural India, creating sustainable wealth within the
+                community.&quot;
+              </p>
+              <div className="flex items-center space-x-2 pt-4">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                  <FaChartPie className="text-sm" />
+                </div>
+                <span className="text-sm font-medium uppercase tracking-widest text-white/70">
+                  Imaigal Trust Mission
+                </span>
+              </div>
+            </div>
+            {/* Simple pattern */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
