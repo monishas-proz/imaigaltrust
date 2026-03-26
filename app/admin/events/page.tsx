@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Edit, Trash2, Users } from "lucide-react";
 import Pagination from "@/app/component/Pagination/Pagination";
 import toast from "react-hot-toast";
+import ConfirmDeleteModal from "@/app/component/DeleteModal/ConfirmDeleteModal";
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -67,45 +68,28 @@ const formatTimeIST = (dateTime: string | Date | null) => {
 //   });
 // };
 
-  const handleDelete = async (id: string) => {
-  toast((t) => (
-    <div className="flex flex-col gap-2">
-      <p className="font-semibold">Delete this event?</p>
-      <div className="flex gap-2 justify-end">
-        <button
-          onClick={() => toast.dismiss(t.id)}
-          className="px-3 py-1 text-sm bg-black rounded"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={async () => {
-            toast.dismiss(t.id);
+  const handleDelete = async () => {
+  if (!deleteId) return;
 
-            try {
-              const response = await fetch(`/api/events/${id}`, {
-                method: "DELETE",
-              });
+  try {
+    const response = await fetch(`/api/events/${deleteId}`, {
+      method: "DELETE",
+    });
 
-              const data = await response.json();
+    const data = await response.json();
 
-              if (response.ok) {
-                toast.success("Event deleted successfully ");
-                fetchEvents();
-              } else {
-                toast.error(data.message || "Delete failed ");
-              }
-            } catch {
-              toast.error("Something went wrong ");
-            }
-          }}
-          className="px-3 py-1 text-sm bg-red-500 text-white rounded"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  ));
+    if (response.ok) {
+      toast.success("Event deleted successfully");
+      fetchEvents();
+    } else {
+      toast.error(data.message || "Delete failed");
+    }
+  } catch {
+    toast.error("Something went wrong");
+  } finally {
+    setShowDeleteModal(false);
+    setDeleteId(null);
+  }
 };
 
   //pagination
@@ -116,6 +100,9 @@ const formatTimeIST = (dateTime: string | Date | null) => {
   const endIndex = startIndex + perPage;
 
   const paginatedEvents = events.slice(startIndex, endIndex);
+//model delete 
+const [deleteId, setDeleteId] = useState<string | null>(null);
+const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -252,7 +239,10 @@ const formatTimeIST = (dateTime: string | Date | null) => {
                             <Edit size={18} />
                           </Link>
                           <button
-                            onClick={() => handleDelete(event.id)}
+                            onClick={() => {
+                            setDeleteId(event.id);
+                            setShowDeleteModal(true);
+                          }}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 border border-transparent hover:border-red-100"
                             title="Delete"
                           >
@@ -286,6 +276,13 @@ const formatTimeIST = (dateTime: string | Date | null) => {
             setCurrentPage(1);
           }}
         />
+        <ConfirmDeleteModal
+  isOpen={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onConfirm={handleDelete}
+  title="Delete Event"
+  message="Are you sure you want to delete this event?"
+/>
     </div>
   );
 }
