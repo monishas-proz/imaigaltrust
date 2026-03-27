@@ -36,6 +36,9 @@ export default function AdminProgramPage() {
  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+// error handling
+  const [errors, setErrors] = useState<{ programs?: string }>({});
+
   useEffect(() => {
     fetchPrograms();
   }, []);
@@ -134,6 +137,21 @@ const fetchPrograms = async () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+
+  let newErrors: any = {};
+
+  // validation
+  if (!formData.programs.trim()) {
+    newErrors.programs = "Program name is required";
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    toast.error("Please fix the errors before submitting.");
+    return;
+  }
+
+  setErrors({});
   setLoading(true);
 
   const toastId = toast.loading(
@@ -149,16 +167,16 @@ const fetchPrograms = async () => {
       method: editingId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-  ...formData,
-  status: Number(formData.status),
-}),
+        ...formData,
+        status: Number(formData.status),
+      }),
     });
 
     if (response.ok) {
       toast.success(
         editingId
-          ? "Program updated successfully "
-          : "Program created successfully ",
+          ? "Program updated successfully"
+          : "Program created successfully",
         { id: toastId }
       );
 
@@ -167,11 +185,11 @@ const fetchPrograms = async () => {
       setFormData({ programs: "", status: "1" });
       fetchPrograms();
     } else {
-      toast.error("Failed to save program ", { id: toastId });
+      toast.error("Failed to save program", { id: toastId });
     }
   } catch (error) {
     console.error("Error saving program:", error);
-    toast.error("Something went wrong ", { id: toastId });
+    toast.error("Something went wrong", { id: toastId });
   } finally {
     setLoading(false);
   }
@@ -330,20 +348,25 @@ const fetchPrograms = async () => {
                   Program Name
                 </label>
                 <input
-                  type="text"
-                  required
-                  value={formData.programs}
-                  onChange={(e) =>
-                  setFormData({
-                  ...formData,
-                  programs: e.target.value
-                  .replace(/[^a-zA-Z\s]/g, "") 
-                  .replace(/\b\w/g, (c) => c.toUpperCase()),
+  type="text"
+  value={formData.programs}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      programs: e.target.value
+        .replace(/[^a-zA-Z\s]/g, "")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
     })
   }
   placeholder="e.g. Tree Plantation, Blood Donation"
-  className="w-full px-5 py-4 border border-gray-200 rounded-2xl"
+  className={`w-full px-5 py-4 border rounded-2xl outline-none
+  ${errors.programs ? "border-red-500" : "border-gray-200"}`}
 />
+{errors.programs && (
+  <p className="text-red-500 text-sm mt-1 ml-1">
+    {errors.programs}
+  </p>
+)}
               </div>
 
               <div className="space-y-2.5">

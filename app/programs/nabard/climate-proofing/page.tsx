@@ -53,7 +53,7 @@ export default function ClimateProofing() {
         ]}
       />
 
-      <div className=" max-w-[1700px] mx-auto px-6 py-10 lg:px-16">
+      <div className=" max-w-[1800px] mx-auto px-6 py-10 lg:px-16">
         {/* Main Content Section */}
         <section className="py-10 max-w-[1700px] mx-auto px-4 md:px-10 flex flex-col md:flex-row items-center gap-8 mb-10">
 

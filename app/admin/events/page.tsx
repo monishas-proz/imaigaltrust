@@ -123,42 +123,26 @@ const [showDeleteModal, setShowDeleteModal] = useState(false);
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full min-w-[1100px] text-left border-collapse">
-            <thead className="bg-[#1a4d2e] text-white">
-              <tr>
-                <th className="p-4 font-bold w-16 uppercase text-xs tracking-wider">
-                  S.No
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  Event Title
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  Program
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider text-left">
-                  Status
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  Start Date
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  End Date
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  Start Time
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  End Time
-                </th>
-                <th className="p-4 font-bold uppercase text-xs tracking-wider">
-                  Location
-                </th>
-                <th className="p-4 font-bold text-center w-32 uppercase text-xs tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+  
+  <div className="w-full overflow-x-auto">
+
+    <table className="min-w-[1400px] w-full text-left border-collapse">
+
+      <thead className="bg-[#1a4d2e] text-white">
+        <tr>
+          <th className="p-4 font-bold w-16 uppercase text-xs">S.No</th>
+          <th className="p-4 font-bold uppercase text-xs">Event Title</th>
+          <th className="p-4 font-bold uppercase text-xs">Program</th>
+          <th className="p-4 font-bold uppercase text-xs">Status</th>
+          <th className="p-4 font-bold uppercase text-xs">Start Date</th>
+          <th className="p-4 font-bold uppercase text-xs">End Date</th>
+          <th className="p-4 font-bold uppercase text-xs">Start Time</th>
+          <th className="p-4 font-bold uppercase text-xs">End Time</th>
+          <th className="p-4 font-bold uppercase text-xs">Location</th>
+          <th className="p-4 font-bold uppercase text-xs text-center">Actions</th>
+        </tr>
+      </thead>
+
             <tbody>
               {isLoading ? (
                 <tr>
@@ -283,6 +267,7 @@ const [showDeleteModal, setShowDeleteModal] = useState(false);
   title="Delete Event"
   message="Are you sure you want to delete this event?"
 />
+    
     </div>
   );
 }

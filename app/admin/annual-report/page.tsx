@@ -301,17 +301,23 @@ export default function AnnualReportFormPage() {
 
                   {/* File */}
                   <div className="space-y-2.5">
-                    <label className="block text-sm font-bold text-gray-700 ml-1">
-                      Upload Report File ({formData.type.toUpperCase()})
-                    </label>
-                    <input
-                      type="file"
-                      accept={getAcceptType()}
-                      onChange={handleFileChange}
-                      required
-                      className="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#096412]/5 focus:border-[#096412] outline-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#096412]/10 file:text-[#096412] hover:file:bg-[#096412]/20 transition-all font-semibold text-sm bg-gray-50/50 cursor-pointer"
-                    />
-                  </div>
+  <label className="block text-sm font-bold text-gray-700 ml-1">
+    Upload Report File ({formData.type.toUpperCase()})
+  </label>
+
+  <input
+    type="file"
+    accept={getAcceptType()}
+    onChange={handleFileChange}
+    required
+    className="w-full px-5 py-3 border border-gray-200 rounded-2xl 
+    focus:ring-4 focus:ring-[#096412]/5 focus:border-[#096412] outline-none 
+    file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 
+    file:text-xs file:font-bold file:bg-[#096412]/10 file:text-[#096412] 
+    hover:file:bg-[#096412]/20 transition-all font-semibold text-sm 
+    bg-gray-50/50 cursor-pointer file:cursor-pointer"
+  />
+</div>
                 </div>
 
                 <div className="pt-8 flex gap-4">
