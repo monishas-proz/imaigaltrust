@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { otpStore } from "../forgot-password/route"; // use the same otpStore
+import otpStore from "@/lib/otp-store";
 
 export async function POST(req: Request) {
   try {

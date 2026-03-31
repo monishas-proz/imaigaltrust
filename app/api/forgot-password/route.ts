@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import prisma from "@/lib/prisma";
+import otpStore from "@/lib/otp-store";
 
 function generateOTP(length = 6) {
   return Math.floor(Math.random() * 10 ** length)
     .toString()
     .padStart(length, "0");
 }
-
-// In-memory OTP store (use DB in production)
-const otpStore = new Map<string, { otp: string; expires: number }>();
 
 export async function POST(req: Request) {
   try {
@@ -29,7 +27,7 @@ export async function POST(req: Request) {
     const otp = generateOTP();
 
     // Save OTP with 5 minute expiry
-    otpStore.set(email, { otp, expires: Date.now() + 2* 60 * 1000 });
+    otpStore.set(email, { otp, expires: Date.now() + 1.5* 60 * 1000 });
 
     // Send OTP via nodemailer
     const transporter = nodemailer.createTransport({
@@ -57,6 +55,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
-
-// Export otpStore so verify-OTP can access it
-export { otpStore };

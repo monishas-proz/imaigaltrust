@@ -9,6 +9,7 @@ import {
   FaLock,
   FaUserShield,
 } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -30,50 +31,90 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   
   const [forgotEmailError, setForgotEmailError] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(90); // counts down for OTP validity
+  const [resendEnabled, setResendEnabled] = useState(false); // controls resend button
 
-const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+const [resendTimer, setResendTimer] = useState(0); // controls Resend button
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
  const [showResetModal, setShowResetModal] = useState(false);
-const [otpTimer, setOtpTimer] = useState(120); // 2 minutes in seconds
+  const [otpVerifying, setOtpVerifying] = useState(false);
+//rate limit otp send 
+const [otpRequestCount, setOtpRequestCount] = useState(0);
+const [otpRequestStart, setOtpRequestStart] = useState<number | null>(null);
 
+// OTP Timer (1.5 seconds)
 useEffect(() => {
-  let timer: NodeJS.Timeout;
-
-  if (showOtpModal && otpTimer > 0) {
-    timer = setInterval(() => {
-      setOtpTimer((prev) => prev - 1);
-    }, 1000);
-  }
-
   if (!showOtpModal) {
-    setOtpTimer(120); 
+    setOtpTimer(90); // reset when modal closes
+    return;
   }
 
-  return () => clearInterval(timer);
-}, [showOtpModal, otpTimer]);
+  const timer = setInterval(() => {
+    setOtpTimer((prev) => {
+      if (prev <= 0) {
+        clearInterval(timer);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1500); // 1.5 seconds interval
+
+  return () => clearInterval(timer); // cleanup on unmount or modal close
+}, [showOtpModal]);
+
+useEffect(() => {
+  if (otpTimer > 0) {
+    const interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
+    return () => clearInterval(interval);
+  }
+}, [otpTimer]);
 
 useEffect(() => {
   let timer: NodeJS.Timeout;
 
   if (showOtpModal && otpTimer > 0) {
-    // Update every 1.5 seconds
     timer = setInterval(() => {
       setOtpTimer((prev) => {
         if (prev <= 0) return 0;
-        return prev - 1; // decrease by 1 second each tick
+        return prev - 1; 
       });
-    }, 1500); // 1.5 seconds
+    }, 1500); 
   }
 
   if (!showOtpModal) {
-    setOtpTimer(120); // reset to 2 minutes
+    setOtpTimer(90); 
   }
 
   return () => clearInterval(timer);
 }, [showOtpModal, otpTimer]);
+
+useEffect(() => {
+  if (resendTimer > 0) {
+    const interval = setInterval(() => setResendTimer((prev) => prev - 1), 1000);
+    return () => clearInterval(interval);
+  }
+}, [resendTimer]);
+
+useEffect(() => {
+  if (!showOtpModal) return;
+
+  const interval = setInterval(() => {
+    setOtpTimer((prev) => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        setResendEnabled(true); // enable resend when timer ends
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [showOtpModal]);
 
 //OTP hide state
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -107,12 +148,25 @@ useEffect(() => {
     }
   };
 
-
-  
-
-  
-  const sendOtp = async () => {
+const sendOtp = async () => {
   const email = forgotEmail.trim();
+
+  if (otpSending) return;
+
+  // max 3 OTP requests per minute
+  const now = Date.now();
+
+  if (otpRequestStart && now - otpRequestStart < 60000) {
+    if (otpRequestCount >= 3) {
+      return toast.error("Too many OTP requests. Please wait 1 minute.");
+    }
+  } else {
+    // Reset window after 1 minute
+    setOtpRequestStart(now);
+    setOtpRequestCount(0);
+  }
+
+  setOtpRequestCount((prev) => prev + 1);
 
   // Validate empty email
   if (!email) return setForgotEmailError("Email is required");
@@ -122,6 +176,7 @@ useEffect(() => {
   if (!emailRegex.test(email)) return setForgotEmailError("Invalid email format");
 
   setForgotEmailError("");
+  setOtpSending(true);
 
   try {
     // Call backend API to generate and send OTP
@@ -133,22 +188,35 @@ useEffect(() => {
 
     const data = await res.json();
 
-    if (!res.ok) return toast.error(data.message || "Failed to send OTP");
+    if (!res.ok) {
+      setTimeout(() => setOtpSending(false), 1500);
+      return toast.error(data.message || "Failed to send OTP");
+    }
 
     // Success
     toast.success("OTP sent successfully!");
     setShowForgotModal(false);
     setShowOtpModal(true);
-    setOtp(""); // reset input
-    setOtpTimer(120); // reset timer
+    setResendEnabled(false);
+
+    setOtp("");        
+    setOtpTimer(90); 
+
   } catch (err) {
     console.error(err);
     toast.error("Server error, try again later");
   }
+
+  // Return button to normal after 1.5s
+  setTimeout(() => {
+    setOtpSending(false);
+  }, 1500);
 };
 // Submit OTP
 const submitOtp = async () => {
   if (!otp) return toast.error("Enter OTP");
+
+  setOtpVerifying(true);
 
   try {
     const res = await fetch("/api/verify-otp", {
@@ -159,15 +227,22 @@ const submitOtp = async () => {
 
     const data = await res.json();
 
-    if (!res.ok) return toast.error(data.message || "Invalid OTP");
+    if (!res.ok) {
+      setOtpVerifying(false);
+      return toast.error(data.message || "Invalid OTP");
+    }
 
     // OTP verified successfully
     toast.success(data.message || "OTP verified successfully!");
+
     setShowOtpModal(false);
     setShowResetModal(true); // show reset password modal
+
   } catch (err) {
     console.error(err);
     toast.error("Server error, try again later");
+  } finally {
+    setOtpVerifying(false);
   }
 };
   return (
@@ -300,20 +375,27 @@ const submitOtp = async () => {
 
       {/* Send OTP Button */}
       <button
-        onClick={sendOtp} 
-        className="w-full py-3 bg-gradient-to-r from-green-900 to-green-900 text-white font-semibold rounded-lg transition"
-      >
-        Send OTP
-      </button>
+  onClick={sendOtp}
+  disabled={otpSending}
+  className={`w-full py-3 text-white font-semibold rounded-lg transition ${
+    otpSending
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-gradient-to-r from-green-900 to-green-900 hover:opacity-90"
+  }`}
+>
+  {otpSending ? "Sending OTP..." : "Send OTP"}
+</button>
     </div>
   </div>
 )}
       
      {/* OTP Modal */}
+{/* OTP Modal */}
 {showOtpModal && (
   <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-md transition">
     <div className="bg-white p-8 rounded-3xl max-w-md w-full relative shadow-2xl border border-gray-100">
 
+      {/* Close Button */}
       <button
         onClick={() => setShowOtpModal(false)}
         className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
@@ -325,21 +407,22 @@ const submitOtp = async () => {
         Enter OTP
       </h2>
 
+      {/* OTP Inputs */}
       <div className="flex justify-center gap-3 mb-2">
-        {[0,1,2,3,4,5].map((i) => (
+        {[0, 1, 2, 3, 4, 5].map((i) => (
           <input
             key={i}
             type="text"
             maxLength={1}
             value={otp[i] || ""}
             onChange={(e) => {
-  const value = e.target.value.replace(/\D/, ""); 
-  const newOtp = otp.split("");
-  newOtp[i] = value;
-  setOtp(newOtp.join(""));
-  const next = e.currentTarget.nextElementSibling as HTMLInputElement | null;
-  if (value && next) next.focus();
-}}
+              const value = e.target.value.replace(/\D/, "");
+              const newOtp = otp.split("");
+              newOtp[i] = value;
+              setOtp(newOtp.join(""));
+              const next = e.currentTarget.nextElementSibling as HTMLInputElement | null;
+              if (value && next) next.focus();
+            }}
             onKeyDown={(e) => {
               const prev = e.currentTarget.previousElementSibling as HTMLInputElement | null;
               if (e.key === "Backspace" && !otp[i] && prev) prev.focus();
@@ -349,25 +432,60 @@ const submitOtp = async () => {
         ))}
       </div>
 
-      {/* OTP expiry countdown */}
-      <p className="text-center text-sm text-gray-500 mb-5">
-  OTP valid for {Math.floor(otpTimer / 60)
-    .toString()
-    .padStart(2, "0")}:
+      {/* OTP Timer */}
+      <p className="text-center text-sm text-gray-500 mb-3">
+  OTP valid for {Math.floor(otpTimer / 60).toString().padStart(2, "0")}:
   {(otpTimer % 60).toString().padStart(2, "0")}
 </p>
 
+      {/* Submit OTP Button */}
       <button
   onClick={submitOtp}
-  disabled={otpTimer === 0}
-  className={`w-full py-3 rounded-xl font-medium shadow-md transition duration-200 text-white ${
-    otpTimer === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-[#166534] hover:bg-[#14532d]"
+  disabled={otpTimer === 0 || otpVerifying}
+  className={`w-full py-3 rounded-xl font-medium shadow-md text-white mb-3 ${
+    otpTimer === 0 || otpVerifying
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-[#166534] hover:bg-[#14532d]"
   }`}
 >
-  Submit OTP
+  {otpVerifying ? "Verifying OTP..." : "Submit OTP"}
 </button>
-    </div>
-  </div>
+
+      {/* Resend OTP */}
+
+<div className="text-center">
+ <button
+  onClick={async () => {
+    if (!resendEnabled) return;
+
+    await sendOtp();
+  }}
+  disabled={!resendEnabled}
+  className={`text-sm font-semibold ${
+    !resendEnabled
+      ? "text-gray-400 cursor-not-allowed"
+      : "text-[#166534] hover:text-[#14532d]"
+  }`}
+>
+  {resendEnabled ? "Resend OTP" : `Resend OTP in ${otpTimer}s`}
+</button>
+</div>
+{/* Change Email / Back */}
+{/* Change Email / Back */}
+<div className="text-center mt-3">
+  <button
+    onClick={() => {
+      setShowOtpModal(false);
+      setShowForgotModal(true);
+    }}
+    className="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-[#166534] font-medium mx-auto"
+  >
+    <FaArrowLeft className="text-xs" />
+    Change Email / Back
+  </button>
+</div>
+</div>
+</div>
 )}
       {/* Reset Password Modal */}
       {showResetModal && (
@@ -463,7 +581,7 @@ const submitOtp = async () => {
       )}
 
 {/* New Password Modal */}
-{showResetPasswordModal && (
+{/* {showResetPasswordModal && (
   <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div className="bg-white p-8 rounded-2xl max-w-md w-full relative">
       <button
@@ -491,15 +609,15 @@ const submitOtp = async () => {
         className="w-full p-3 border border-gray-200 rounded-xl mb-4 outline-none focus:border-[#166534]"
       />
 
-      {/* <button
+      <button
         onClick={resetPassword}
         className="w-full bg-[#166534] text-white py-3 rounded-xl"
       >
         Reset Password
-      </button> */}
+      </button>
     </div>
   </div>
-)}
+)} */}
       <Toaster />
     </div>
   );
