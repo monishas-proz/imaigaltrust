@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { Toaster } from "react-hot-toast";
 export default function EditEventPage({
   params,
 }: {
@@ -146,7 +145,7 @@ export default function EditEventPage({
     if (coverImage) data.append("coverImage", coverImage);
 
     // Use toast.promise so user always sees feedback
-    const result = await toast.promise(
+    await toast.promise(
       fetch(`/api/events/${id}`, {
         method: "PUT",
         body: data,

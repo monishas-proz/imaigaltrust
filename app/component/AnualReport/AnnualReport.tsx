@@ -31,9 +31,10 @@ interface ReportDocument {
 }
 
 interface Report {
-  id: string;
+  id: number | string;
   title: string;
-    document: ReportDocument[];
+  type?: string;
+  document: ReportDocument[];
 }
 
   const [selectedData, setSelectedData] = useState<Report | null>(null);
@@ -62,40 +63,57 @@ interface Report {
     fetchReports();
   }, []);
 
-  // Map database reports to match the existing component's structure
-  const mappedDbReports = dbReports.map((report) => ({
-    id: `db-${report.id}`, // Unique ID for mixing with static reports
-    title: `Annual Report ${report.year}`,
-    document: [
-      {
-        id: report.id,
-        name: "Annual Report Document",
-        links: [
-          {
-            id: report.id,
-            name: `${report.language} Version`,
-            link: report.file_path,
-            type: report.type,
-          },
-        ],
-      },
-    ],
-  }));
+  // Group database reports by year
+const groupedReports = dbReports.reduce<Record<string, Report>>((acc, report) => {
+  const year = report.year;
 
-  // Combine static data with database data
-  const allReports = [...mappedDbReports, ...reportList];
+  if (!acc[year]) {
+    acc[year] = {
+      id: `year-${year}`,
+      title: `Annual Report ${year}`,
+      document: [
+        {
+          name: "Annual Report Documents",
+          links: [],
+        },
+      ],
+    };
+  }
 
-  // Filter & Pagination using combined list
-  const filteredReports = selectedYear
-    ? allReports.filter((item) => item.title.includes(selectedYear))
-    : allReports;
+  // Store PDF, Word and Excel files
+  if (
+    report.type === "pdf" ||
+    report.type === "word" ||
+    report.type === "excel"
+  ) {
+    acc[year].document[0].links.push({
+      name: `${report.language.toUpperCase()} ${report.type.toUpperCase()}`,
+      link: report.file_path,
+      type: report.type,
+    });
+  }
 
-  const totalItems = filteredReports.length;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentReports = filteredReports.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+  return acc;
+}, {});
+// Convert object → array
+const mappedDbReports: Report[] = Object.values(groupedReports);
+
+// Combine static data with database data
+// const allReports = [...mappedDbReports, ...reportList];
+const allReports: Report[] = [...mappedDbReports, ...reportList];
+// Filter
+const filteredReports = selectedYear
+  ? allReports.filter((item) => item.title.includes(selectedYear))
+  : allReports;
+
+// Pagination
+const totalItems = filteredReports.length;
+const startIndex = (currentPage - 1) * itemsPerPage;
+
+const currentReports = filteredReports.slice(
+  startIndex,
+  startIndex + itemsPerPage
+);
 
   return (
     <>
@@ -140,10 +158,10 @@ interface Report {
                     <div className="flex items-center gap-2">
                       <button
                         className="bg-white text-gray-900 text-sm px-4 py-1 font-semibold rounded flex items-center gap-2 hover:bg-gray-300 transition duration-300"
-                        onClick={() => {
-        setViewMode(true);
-setSelectedData(item as Report);
-  }}
+                       onClick={() => {
+  setSelectedData(item);
+  setViewMode(true);
+}}
                       >
                         View
                         <Image
@@ -181,24 +199,24 @@ setSelectedData(item as Report);
       )}
 
       {/* View Mode */}
-      {viewMode && selectedData && (
-        <ViewMode
-          data={[
-              {
-title: selectedData.title,
-              document: selectedData.document.map((doc) => ({
-                name: doc.name,
-                links: doc.links.map((link) => ({
-                  name: link.name,
-                  link: link.link,
-                  type: link.type,
-})),
-                })),
-              },
-            ]}
-          clickEvent={() => setViewMode(false)}
-        />
-      )}
+     {viewMode && selectedData && (
+  <ViewMode
+    data={[
+      {
+        title: selectedData.title,
+        document: selectedData.document.map((doc) => ({
+          name: doc.name,
+          links: doc.links.map((link) => ({
+            name: link.name,
+            link: link.link,
+            type: link.type,
+          })),
+        })),
+      },
+    ]}
+    clickEvent={() => setViewMode(false)}
+  />
+)}
     </>
   );
 }
