@@ -5,6 +5,12 @@ import { Calendar, Clock, Users, FileText, Layers, DollarSign, UserPlus } from "
 
 type Counts = {
   totalMembers: number;
+  paidMembers: number;
+  freeVolunteers: number;
+  pendingMembers: number;
+  approvedMembers: number;
+  rejectedMembers: number;
+
   totalEvents: number;
   pendingApprovals: number;
   membershipRevenue: number;
@@ -13,6 +19,7 @@ type Counts = {
   pastEvents: number;
   draftEvents: number;
   registerCount: number;
+  annualReportCount: number;
 };
 
 type CardProps = {
@@ -22,7 +29,6 @@ type CardProps = {
   color: "green" | "blue" | "yellow" | "purple" | "red" | "indigo";
 };
 
-// Reusable card component
 function Card({ icon, title, count, color }: CardProps) {
   const bgColors: Record<CardProps["color"], string> = {
     green: "from-green-50 to-green-100",
@@ -32,7 +38,6 @@ function Card({ icon, title, count, color }: CardProps) {
     red: "from-red-50 to-red-100",
     indigo: "from-indigo-50 to-indigo-100",
   };
-
   const borderColors: Record<CardProps["color"], string> = {
     green: "border-green-100",
     blue: "border-blue-100",
@@ -41,7 +46,6 @@ function Card({ icon, title, count, color }: CardProps) {
     red: "border-red-100",
     indigo: "border-indigo-100",
   };
-
   const textColors: Record<CardProps["color"], string> = {
     green: "text-green-700",
     blue: "text-blue-700",
@@ -65,6 +69,11 @@ function Card({ icon, title, count, color }: CardProps) {
 export default function DashboardPage() {
   const [counts, setCounts] = useState<Counts>({
     totalMembers: 0,
+    paidMembers: 0,
+    freeVolunteers: 0,
+    pendingMembers: 0,
+    approvedMembers: 0,
+    rejectedMembers: 0,
     totalEvents: 0,
     pendingApprovals: 0,
     membershipRevenue: 0,
@@ -73,6 +82,7 @@ export default function DashboardPage() {
     pastEvents: 0,
     draftEvents: 0,
     registerCount: 0,
+    annualReportCount: 0,
   });
 
   useEffect(() => {
@@ -84,7 +94,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 p-6">
-      
       {/* Platform Summary */}
       <h2 className="text-xl font-bold text-gray-700">Platform Summary</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -108,7 +117,26 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <Card icon={<Users className="text-yellow-600" />} title="Total Registrations" count={counts.registerCount} color="yellow" />
       </div>
-      
+
+     
+
+      {/* Membership Breakdown */}
+      <h2 className="text-xl font-bold text-gray-700">Membership Breakdown</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card icon={<Users className="text-blue-600" />} title="Total Members" count={counts.totalMembers} color="blue" />
+        <Card icon={<DollarSign className="text-green-600" />} title="Paid Members" count={counts.paidMembers} color="green" />
+        <Card icon={<UserPlus className="text-yellow-600" />} title="Free Volunteers" count={counts.freeVolunteers} color="yellow" />
+        <Card icon={<Users className="text-purple-600" />} title="Pending Members" count={counts.pendingMembers} color="purple" />
+        <Card icon={<Users className="text-indigo-600" />} title="Approved Members" count={counts.approvedMembers} color="indigo" />
+        <Card icon={<Users className="text-red-600" />} title="Rejected Members" count={counts.rejectedMembers} color="red" />
+      </div>
+
+       {/* Annual Reports */}
+      <h2 className="text-xl font-bold text-gray-700">Annual Reports</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+
+      <Card icon={<FileText className="text-indigo-600" />} title="Annual Reports" count={counts.annualReportCount} color="indigo" />
+      </div>
     </div>
   );
 }

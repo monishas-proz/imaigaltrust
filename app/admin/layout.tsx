@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Users,
   FileText,
@@ -16,11 +16,13 @@ import {
 } from "lucide-react";
 
 export default function AdminLayout({
+  
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(
     pathname.includes("/admin/gallery"),
@@ -30,9 +32,15 @@ export default function AdminLayout({
   );
   const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+React.useEffect(() => {
+  setMounted(true);
+
+  const auth = sessionStorage.getItem("authToken");
+
+  if (!auth) {
+    router.push("/login");
+  }
+}, [router]);
 
   const navItems = [
   {
@@ -52,6 +60,10 @@ export default function AdminLayout({
   },
 ];
 
+const handleLogout = () => {
+  sessionStorage.removeItem("authToken");
+  router.push("/login");
+};
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
@@ -283,14 +295,16 @@ export default function AdminLayout({
                     View Website
                   </Link>
                   <div className="my-1 border-t border-gray-50" />
-                  <Link
-                    href="/login"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-semibold"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </Link>
+                 <button
+  onClick={() => {
+    handleLogout();
+    setIsDropdownOpen(false);
+  }}
+  className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-semibold"
+>
+  <LogOut size={16} />
+  Logout
+</button>
                 </div>
               )}
             </div>

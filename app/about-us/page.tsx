@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import PageBanner from "@/app/component/Banner/PageBanner/PageBanner";
 import { Compass } from "lucide-react";

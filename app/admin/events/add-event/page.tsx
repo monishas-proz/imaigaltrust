@@ -7,10 +7,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
+interface Program {
+  id: number;
+  programs: string;
+  status: number;
+  created_at: string;
+}
+
 export default function AddEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [programs, setPrograms] = useState([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
@@ -336,33 +343,39 @@ const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 )}
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">
-                Program <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <select
-                  required
-                  name="programId"
-                  value={formData.programId}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-[#1a4d2e]/20 focus:border-[#1a4d2e] outline-none transition-all bg-white"
-                >
-                  <option value="">Select Program</option>
-                  {programs.map((p: { id: string; programs: string }) => (
-                    <option key={p.id} value={p.id}>
-                      {p.programs}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  <ChevronDown size={18} />
-                </div>
-                {errors.programId && (
-  <p className="text-red-500 text-sm">{errors.programId}</p>
-)}
-              </div>
-            </div>
+           <div className="space-y-2">
+  <label className="block text-sm font-bold text-gray-700">
+    Program <span className="text-red-500">*</span>
+  </label>
+
+  <div className="relative">
+    <select
+      required
+      name="programId"
+      value={formData.programId}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-[#1a4d2e]/20 focus:border-[#1a4d2e] outline-none transition-all bg-white"
+    >
+      <option value="">Select Program</option>
+
+      {programs
+        .filter((p: Program) => Number(p.status) === 1) // ✅ only active
+        .map((p: Program) => (
+          <option key={p.id} value={p.id}>
+            {p.programs}
+          </option>
+        ))}
+    </select>
+
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+      <ChevronDown size={18} />
+    </div>
+
+    {errors.programId && (
+      <p className="text-red-500 text-sm">{errors.programId}</p>
+    )}
+  </div>
+</div>
 
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">

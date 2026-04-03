@@ -530,7 +530,7 @@ Actions</th>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Program */}
                 <div className="space-y-2.5">
-                  <label className="block text-sm font-bold text-gray-700 ml-1">Program</label>
+                  <label className="block text-sm font-bold text-gray-700 ml-1">Program <span className="text-red-500">*</span></label> 
                   <div className="relative">
                   <select
   suppressHydrationWarning
@@ -562,7 +562,7 @@ Actions</th>
 
                 {/* Category */}
                 <div className="space-y-2.5">
-                  <label className="block text-sm font-bold text-gray-700 ml-1">Category</label>
+                  <label className="block text-sm font-bold text-gray-700 ml-1">Category <span className="text-red-500">*</span></label>
                   <div className="relative">
                    <select
   value={formData.categoryId}
@@ -619,7 +619,7 @@ Actions</th>
 </div>
                 {/* Month */}
                 <div className="space-y-2.5">
-                  <label className="block text-sm font-bold text-gray-700 ml-1">Month (Optional)</label>
+                  <label className="block text-sm font-bold text-gray-700 ml-1">Month <span className="text-red-500">*</span> (Optional) </label>
                   <div className="relative">
                     <select
   suppressHydrationWarning
@@ -651,7 +651,7 @@ Actions</th>
 
               {/* Title */}
               <div className="space-y-2.5">
-                <label className="block text-sm font-bold text-gray-700 ml-1">Title</label>
+                <label className="block text-sm font-bold text-gray-700 ml-1">Title <span className="text-red-500">*</span></label>
                 <input
   type="text"
   value={formData.title}
@@ -709,7 +709,7 @@ Actions</th>
 
               {/* Description */}
               <div className="space-y-2.5">
-                <label className="block text-sm font-bold text-gray-700 ml-1">Description</label>
+                <label className="block text-sm font-bold text-gray-700 ml-1">Description <span className="text-red-500">*</span></label>
                 <textarea
   rows={3}
   value={formData.description}
@@ -732,7 +732,7 @@ Actions</th>
               {/* File / Video */}
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  {formData.mediaType === "image" ? "File Upload" : "Video URL / Embed"}
+                  {formData.mediaType === "image" ? "File Upload" : "Video URL / Embed"} <span className="text-red-500">*</span>
                 </label>
                 {formData.mediaType === "image" ? (
                   <div
