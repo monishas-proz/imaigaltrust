@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import PageBanner from "../component/Banner/PageBanner/PageBanner";
-import { Calendar, MapPin, Users, Clock, X, ChevronDown } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, X } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import "./registration.css";
@@ -520,7 +520,7 @@ reset();
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+            {/* <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} /> */}
           </div>
           {errors.gender && <p className="text-red-500 text-xs">{errors.gender.message}</p>}
         </div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+
 import {
   FaEye,
   FaEyeSlash,
@@ -11,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+
 import { Toaster, toast } from "react-hot-toast";
 
 type LoginForm = {
@@ -19,6 +21,7 @@ type LoginForm = {
 };
 
 export default function LoginPage() {
+  
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +48,14 @@ const [resendTimer, setResendTimer] = useState(0); // controls Resend button
 //rate limit otp send 
 const [otpRequestCount, setOtpRequestCount] = useState(0);
 const [otpRequestStart, setOtpRequestStart] = useState<number | null>(null);
+useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+    if (!isLoggedIn) {
+      router.push("/login"); // redirect if not logged in
+    }
+  }, [router]);
+
 
 // OTP Timer (1.5 seconds)
 useEffect(() => {
@@ -133,13 +144,16 @@ useEffect(() => {
     setLoading(true);
     try {
       const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      if (res.ok) router.push("/admin");
-      else alert(result.message || "Login failed");
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+});
+const result = await res.json();
+if (res.ok) {
+  sessionStorage.setItem("authToken", "loggedin");
+router.push("/admin");
+}
+else alert(result.message || "Login failed");
     } catch (err) {
       console.error(err);
       alert("Server error, try again later");

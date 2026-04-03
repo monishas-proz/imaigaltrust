@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Users,
   FileText,
@@ -16,11 +16,13 @@ import {
 } from "lucide-react";
 
 export default function AdminLayout({
+  
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(
     pathname.includes("/admin/gallery"),
@@ -30,9 +32,15 @@ export default function AdminLayout({
   );
   const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+React.useEffect(() => {
+  setMounted(true);
+
+  const auth = sessionStorage.getItem("authToken");
+
+  if (!auth) {
+    router.push("/login");
+  }
+}, [router]);
 
   const navItems = [
   {
@@ -52,17 +60,22 @@ export default function AdminLayout({
   },
 ];
 
+const handleLogout = () => {
+  sessionStorage.removeItem("authToken");
+  router.push("/login");
+};
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
-<aside className="w-72 bg-[#112e1a] text-white flex flex-col flex-shrink-0">        {/* Logo */}
-        <div className="p-8 border-b border-white/5">
-          <h2 className="text-xl font-bold tracking-widest josefin-font text-gray-400 brightness-125 uppercase">Admin Portal</h2>
-          <p className="text-[11px] text-gray-400 mt-1 uppercase tracking-[0.2em]">Management System</p>
-        </div>
+<aside className="w-72 bg-[#112e1a] text-white flex flex-col flex-shrink-0 h-screen">
+  {/* Logo */}
+  <div className="p-8 border-b border-white/5 flex-shrink-0">
+    <h2 className="text-xl font-bold tracking-widest josefin-font text-gray-400 brightness-125 uppercase">Admin Portal</h2>
+    <p className="text-[11px] text-gray-400 mt-1 uppercase tracking-[0.2em]">Management System</p>
+  </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 mt-6 px-4 space-y-1.5">
+  {/* Navigation (scrollable) */}
+<nav className="flex-1 mt-6 px-4 space-y-1.5 overflow-y-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -282,14 +295,16 @@ export default function AdminLayout({
                     View Website
                   </Link>
                   <div className="my-1 border-t border-gray-50" />
-                  <Link
-                    href="/login"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-semibold"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </Link>
+                 <button
+  onClick={() => {
+    handleLogout();
+    setIsDropdownOpen(false);
+  }}
+  className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-semibold"
+>
+  <LogOut size={16} />
+  Logout
+</button>
                 </div>
               )}
             </div>

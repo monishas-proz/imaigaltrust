@@ -76,25 +76,21 @@ const ViewMode: React.FC<ViewModeProps> = ({ data, clickEvent }) => {
             </span>
 
             {/* English Button */}
-            <div className="flex md:justify-end md:pl-5 w-full pr-5">
-              {item?.links?.map((link, linkIndex) => (
-                <span key={linkIndex}>
-                  {link?.name === "English" && (
-                    <a href={link.link} download target="_blank">
-                      <Button
-                        label={
-                          <span className="flex font-normal gap-2 items-center">
-                            {getIcon(link?.type)}
-                            {link?.type?.toUpperCase()}
-                          </span>
-                        }
-                        className="text-accent-700 capitalize bg-white blue__btn text-sm rounded px-4 py-2"
-                      />
-                    </a>
-                  )}
-                </span>
-              ))}
-            </div>
+            <div className="flex flex-col md:items-end gap-2 w-full pr-5">
+  {item?.links?.map((link, linkIndex) => (
+    <a key={linkIndex} href={link.link} download target="_blank">
+      <Button
+        label={
+          <span className="flex font-normal gap-2 items-center">
+            {getIcon(link?.type)}
+            {link?.name}
+          </span>
+        }
+        className="text-accent-700 capitalize bg-white blue__btn text-sm rounded px-4 py-2"
+      />
+    </a>
+  ))}
+</div>
 
             {/* Hindi Button (commented) */}
             {/*

@@ -7,10 +7,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
+interface Program {
+  id: number;
+  programs: string;
+  status: number;
+  created_at: string;
+}
+
 export default function AddEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [programs, setPrograms] = useState([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
@@ -34,7 +41,7 @@ export default function AddEventPage() {
 
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
-
+  
   useEffect(() => {
     // Fetch programs and categories from existing API endpoints
     const fetchDropdowns = async () => {
@@ -67,7 +74,19 @@ export default function AddEventPage() {
   if (!formData.endDate) newErrors.endDate = "End date is required";
   if (!formData.endTime) newErrors.endTime = "End time is required";
   if (!formData.location.trim()) newErrors.location = "Location is required";
-  
+  if (!formData.registrationEndDate) {
+  newErrors.RegistrationEndDate = "Registration End Date is required";
+}
+
+// End date must be after start date
+if (
+  formData.registrationStartDate &&
+  formData.registrationEndDate &&
+  formData.registrationEndDate < formData.registrationStartDate
+) {
+  newErrors.RegistrationEndDate =
+    "Registration End Date must be after Start Date";
+}
 
   if (!formData.shortDescription.trim())
     newErrors.shortDescription = "Short description is required";
@@ -132,7 +151,38 @@ if (formData.videoUrl) {
 
   return newErrors;
 };
+// const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     if (e.target.files && e.target.files[0]) {
+//       setCoverImage(e.target.files[0]);
+//     }
+//   };
 
+
+const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const maxSize = 2 * 1024 * 1024; // 2MB
+
+  if (file.size > maxSize) {
+    setErrors((prev) => ({
+      ...prev,
+      coverImage: "Image must be 2MB or smaller",
+    }));
+
+    e.target.value = ""; // reset file input
+    setCoverImage(null);
+    return;
+  }
+
+  // If file size is valid
+  setErrors((prev) => ({
+    ...prev,
+    coverImage: "",
+  }));
+
+  setCoverImage(file);
+};
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -142,21 +192,36 @@ if (formData.videoUrl) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setCoverImage(e.target.files[0]);
-    }
-  };
+  
+  // const handleGalleryImagesChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   if (e.target.files) {
+  //     const newFiles = Array.from(e.target.files);
+  //     setGalleryImages((prev) => [...prev, ...newFiles]);
+  //   }
+  // };
+  const handleGalleryImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = e.target.files;
+  if (!files) return;
 
-  const handleGalleryImagesChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setGalleryImages((prev) => [...prev, ...newFiles]);
-    }
-  };
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  const validFiles: File[] = [];
 
+  Array.from(files).forEach((file) => {
+    if (file.size > maxSize) {
+      alert(`${file.name} is larger than 2MB`);
+    } else {
+      validFiles.push(file);
+    }
+  });
+
+  if (validFiles.length > 0) {
+    setGalleryImages((prev: File[]) => [...prev, ...validFiles]);
+  }
+
+  e.target.value = ""; // reset input
+};
   const removeGalleryImage = (index: number) => {
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   };
@@ -169,7 +234,7 @@ if (formData.videoUrl) {
   e.preventDefault();
 
   setActiveAction(isDraft ? "draft" : "publish");
-
+    setLoading(true);
   const newErrors = validateForm();
   setErrors(newErrors);
 
@@ -278,33 +343,39 @@ if (formData.videoUrl) {
 )}
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">
-                Program <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <select
-                  required
-                  name="programId"
-                  value={formData.programId}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-[#1a4d2e]/20 focus:border-[#1a4d2e] outline-none transition-all bg-white"
-                >
-                  <option value="">Select Program</option>
-                  {programs.map((p: { id: string; programs: string }) => (
-                    <option key={p.id} value={p.id}>
-                      {p.programs}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  <ChevronDown size={18} />
-                </div>
-                {errors.programId && (
-  <p className="text-red-500 text-sm">{errors.programId}</p>
-)}
-              </div>
-            </div>
+           <div className="space-y-2">
+  <label className="block text-sm font-bold text-gray-700">
+    Program <span className="text-red-500">*</span>
+  </label>
+
+  <div className="relative">
+    <select
+      required
+      name="programId"
+      value={formData.programId}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-[#1a4d2e]/20 focus:border-[#1a4d2e] outline-none transition-all bg-white"
+    >
+      <option value="">Select Program</option>
+
+      {programs
+        .filter((p: Program) => Number(p.status) === 1) // ✅ only active
+        .map((p: Program) => (
+          <option key={p.id} value={p.id}>
+            {p.programs}
+          </option>
+        ))}
+    </select>
+
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+      <ChevronDown size={18} />
+    </div>
+
+    {errors.programId && (
+      <p className="text-red-500 text-sm">{errors.programId}</p>
+    )}
+  </div>
+</div>
 
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">
@@ -490,7 +561,7 @@ if (formData.videoUrl) {
 
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">
-                Full Description
+                Full Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={6}
@@ -510,7 +581,7 @@ if (formData.videoUrl) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  Contact Person
+                  Contact Person <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -562,7 +633,7 @@ if (formData.videoUrl) {
         <section>
           <div className="border-b border-gray-200 pb-2 mb-6">
             <h2 className="text-xl font-bold text-[#1a4d2e]">
-              Media & Coverage
+              Media & Coverage <span className="text-red-500">*</span>
             </h2>
             <p className="text-sm text-gray-500">Visual assets for the event</p>
           </div>
@@ -607,7 +678,7 @@ if (formData.videoUrl) {
                     listing page.
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Recommended: 1200 x 630 px (16:9), JPG or PNG, max 5 MB.
+                    Recommended: 1200 x 630 px (16:9), JPG or PNG, max 2 MB.
                   </p>
                 </div>
                 
@@ -629,15 +700,16 @@ if (formData.videoUrl) {
                     onChange={handleCoverImageChange}
                   />
                   {coverImage ? (
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={URL.createObjectURL(coverImage)}
-                        alt="Cover preview"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
+  <div className="relative w-full h-full">
+    <Image
+      src={URL.createObjectURL(coverImage)}
+      alt="Cover Preview"
+      fill
+      className="object-cover"
+    />
+  </div>
+) : (
+                   
                     <div className="text-center p-4">
                       <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Upload size={24} />
@@ -653,7 +725,7 @@ if (formData.videoUrl) {
                     Click the thumbnail to upload a cover image.
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Accepted: JPG, PNG, WEBP · Max: 5 MB
+                    Accepted: JPG, PNG, WEBP · Max: 2 MB
                   </p>
                   {coverImage && (
                     <button
@@ -675,7 +747,7 @@ if (formData.videoUrl) {
 
             <div className="space-y-2 pt-4">
               <label className="block text-sm font-bold text-gray-700 uppercase tracking-wide">
-                Additional Gallery Images{" "}
+                Additional Gallery Images{" "}<span className="text-red-500">*</span> 
                 <span className="text-xs font-normal text-gray-500 normal-case">
                   (Shown in the event gallery section)
                 </span>
@@ -721,15 +793,15 @@ if (formData.videoUrl) {
                         fill
                         className="object-cover"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button
-                          type="button"
-                          onClick={() => removeGalleryImage(index)}
-                          className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 hover:scale-110 transition-all shadow-lg z-10"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
+                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+  <button
+    type="button"
+    onClick={() => removeGalleryImage(index)}
+    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 hover:scale-110 transition-all shadow-lg z-10"
+  >
+    <X size={16} />
+  </button>
+</div>
                     </div>
                   ))}
                 </div>
@@ -791,13 +863,14 @@ if (formData.videoUrl) {
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">
-                Registration End Date
+                Registration End Date <span className="text-red-500">*</span>
               </label>
               <input
-                type="date"
-                name="registrationEndDate"
-                value={formData.registrationEndDate}
-                onChange={handleInputChange}
+               type="date"
+  name="registrationEndDate"
+  min={formData.registrationStartDate}
+  value={formData.registrationEndDate}
+  onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1a4d2e]/20 focus:border-[#1a4d2e] outline-none transition-all"
               />
             {errors.RegistrationEndDate && (
@@ -810,24 +883,31 @@ if (formData.videoUrl) {
         {/* ACTIONS */}
         <div className="pt-6 border-t border-gray-200 flex justify-end gap-4">
 
+  {/* Save Draft */}
   <button
     type="button"
     onClick={(e) => handleSubmit(e, true)}
     disabled={loading && activeAction === "publish"}
     className="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors disabled:opacity-50"
   >
-    Save as Draft
+    {loading && activeAction === "draft" ? (
+      <div className="w-5 h-5 border-2 border-gray-700 border-t-transparent rounded-full animate-spin" />
+    ) : (
+      "Save as Draft"
+    )}
   </button>
 
+  {/* Publish */}
   <button
     type="button"
     onClick={(e) => handleSubmit(e, false)}
-    disabled={loading}
+    disabled={loading && activeAction === "draft"}
     className="px-8 py-3 bg-[#1a4d2e] hover:bg-[#133922] text-white font-bold rounded-xl shadow-md transition-colors disabled:opacity-50 flex items-center gap-2"
   >
     {loading && activeAction === "publish" ? (
       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
     ) : null}
+
     Publish Event
   </button>
 

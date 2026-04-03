@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { IoArrowBack } from "react-icons/io5";
+
 import {
   Users,
   Calendar,
@@ -47,10 +50,12 @@ interface Registration {
   };
 }
 export default function EventRegistrationsPage() {
+    const router = useRouter();
+
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReg, setSelectedReg] = useState<Registration | null>(null);
-
+      
   const fetchRegistrations = async () => {
     try {
       const searchParams =
@@ -82,6 +87,15 @@ export default function EventRegistrationsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-4 justify-end">
+ <button
+  onClick={() => router.push("/admin/events")}
+  className="flex items-center gap-2 bg-gray-500  text-white px-4 py-2 rounded text-sml font-medium"
+>
+  <IoArrowBack />
+    Back
+</button>
+</div>
       {eventInfo && (
         <div className="space-y-8">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm transition-all hover:shadow-md overflow-hidden">
