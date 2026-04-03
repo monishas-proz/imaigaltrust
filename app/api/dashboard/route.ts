@@ -13,15 +13,19 @@ export async function GET() {
     });
 
     // Membership Revenue
-    const memberships = await prisma.membership.findMany({
-      select: { membership_fee: true },
-    });
+   // Membership Revenue
+const memberships = await prisma.membership.findMany({
+  select: { membership_fee: true },
+});
 
-    const membershipRevenue = memberships.reduce(
-      (sum, m) => sum + Number(m.membership_fee || 0),
-      0
-    );
+let membershipRevenue = 0;
 
+memberships.forEach(m => {
+  // Remove any commas, trim string, convert to number safely
+  const fee = m.membership_fee ? Number(m.membership_fee.toString().replace(/,/g, '').trim()) : 0;
+  membershipRevenue += isNaN(fee) ? 0 : fee;
+});
+    
     // Membership Breakdown
     const paidMembers = await prisma.membership.count({
       where: {

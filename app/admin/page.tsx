@@ -100,7 +100,7 @@ export default function DashboardPage() {
         <Card icon={<Users className="text-blue-600" />} title="Total Members" count={counts.totalMembers} color="blue" />
         <Card icon={<Layers className="text-purple-600" />} title="Total Events" count={counts.totalEvents} color="purple" />
         <Card icon={<UserPlus className="text-yellow-600" />} title="Pending Approvals" count={counts.pendingApprovals} color="yellow" />
-        <Card icon={<DollarSign className="text-green-600" />} title="Membership Revenue" count={`$${counts.membershipRevenue}`} color="green" />
+        <Card icon={<DollarSign className="text-green-600" />} title="Membership Revenue" count={`₹${counts.membershipRevenue}`} color="green" />
       </div>
 
       {/* Event Summary */}
