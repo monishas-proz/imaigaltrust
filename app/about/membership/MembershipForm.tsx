@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { states } from "@/app/content/StateList";
-import toast from "react-hot-toast";
-
+import { toast } from "react-hot-toast";
 const MembershipForm: React.FC = () => {
   const [form, setForm] = useState({
     name: "",
@@ -183,7 +182,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   // Validate voluntary donation
   if (isPaidDonation && Number(form.voluntaryDonation) < 1000) {
-    toast.error("Minimum donation is ₹1000");
+    toast.error(" Minimum donation amount is ₹1000 for paid donations.");
     setIsSubmitting(false);
     return;
   }
@@ -197,7 +196,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   if (!isValid || Object.keys(newErrors).length > 0) {
     setErrors((prev) => ({ ...prev, ...newErrors }));
-    toast.error("Please fix the errors before submitting.");
+    toast.error(" Please fix the errors before submitting the form.");
     setIsSubmitting(false);
     return;
   }
@@ -218,7 +217,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     const data = await res.json();
 
     if (data.success) {
-      toast.success("Form submitted successfully!");
+      toast.success(" Membership application submitted successfully! We'll review your application and get back to you soon.");
       setForm({
         name: "",
         dob: "",
@@ -236,11 +235,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       setIsPaidDonation(false);
       setErrors({});
     } else {
-      toast.error("Something went wrong.");
+      toast.error(" Something went wrong. Please try again.");
     }
   } catch (error) {
     console.error(error);
-    toast.error("Server error");
+    toast.error(" Server error. Please check your connection and try again.");
   } finally {
     setIsSubmitting(false); // Re-enable button
   }
