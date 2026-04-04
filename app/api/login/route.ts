@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       where: {
         email: email,
         password: password,
-        status_active: 1
+        is_active: 1
       },
     });
 
