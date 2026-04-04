@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import prisma from "@/lib/prisma";
 import otpStore from "@/lib/otp-store";
+import { headers } from "next/headers";
+
+export const dynamic = "force-dynamic";
 
 function generateOTP(length = 6) {
   return Math.floor(Math.random() * 10 ** length)
@@ -10,6 +13,13 @@ function generateOTP(length = 6) {
 }
 
 export async function POST(req: Request) {
+  // Force dynamic execution by accessing headers
+  await headers();
+
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return NextResponse.json({ message: "Build phase" });
+  }
+
   try {
     const { email } = await req.json();
 

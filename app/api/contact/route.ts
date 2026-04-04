@@ -1,7 +1,16 @@
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  // Force dynamic execution by accessing headers
+  await headers();
+
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return NextResponse.json({ message: "Build phase" });
+  }
 
   const { fullName, phone, email, organisation, subject, message } = await req.json();
 
