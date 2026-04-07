@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import fs from "fs";
+import path from "path";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -25,6 +27,10 @@ export async function DELETE(
     const { prisma } = await import("@/lib/prisma");
     const resolvedParams = await params;
     const id = parseInt(resolvedParams.id, 10);
+
+    const report = await prisma.annualReport.findUnique({
+      where: { id }
+    });
 
     if (!report) {
       return NextResponse.json({ message: "Report not found" }, { status: 404 });
@@ -56,6 +62,10 @@ export async function GET(
     const { prisma } = await import("@/lib/prisma");
     const resolvedParams = await params;
     const id = parseInt(resolvedParams.id, 10);
+
+    const report = await prisma.annualReport.findUnique({
+      where: { id }
+    });
 
     if (!report) {
       return NextResponse.json({ message: "Report not found" }, { status: 404 });

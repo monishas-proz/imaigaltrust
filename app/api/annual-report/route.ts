@@ -35,8 +35,8 @@ export async function POST(request: Request) {
     await mkdir(reportsDir, { recursive: true });
 
     const filename = `${Date.now()}-${file.name.replaceAll(" ", "_")}`;
-    const filePath = path.join(uploadsDir, filename);
-    await fs.promises.writeFile(filePath, buffer);
+    const filePath = path.join(reportsDir, filename);
+    await writeFile(filePath, buffer);
 
     const annualReport = await prisma.annualReport.create({
       data: { type, year, language, file_path: filename },
