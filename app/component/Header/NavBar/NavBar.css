@@ -34,10 +34,18 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  
-  /* border: 2px solid #1B2F7C; */
-  background:#1B2F7C;
+  background: #1B2F7C; 
+  box-sizing: border-box;
 }
+
+@media (max-width: 768px) {
+  .containers {
+    
+        
+    background: white;   
+  }
+}
+
 
 .logo-container {
   flex: 1;
@@ -45,9 +53,19 @@ header {
   align-items: center;
 }
 
+/* Mobile view */
+@media (max-width: 768px) {
+  .logo-container {
+    display: flex;          
+    margin-left: -20px; /* Adjust this value as needed to align the logo */
+    width: 100%;            
+  }
+}
+
 .nav-btn {
   flex: 3;
   display: flex;
+  margin-right: 60px;
 }
 
 .nav-links {
@@ -84,6 +102,8 @@ header {
   margin: 0 0.2rem;
   transition: 0.3s;
   text-transform: uppercase;
+  background-color: transparent;
+  
 }
 
 .btn.solid,
@@ -291,6 +311,7 @@ header {
 @media (max-width: 920px) {
   .hamburger-menu-container {
     display: flex;
+    
   }
   .logo-container {
     display: flex;
@@ -308,7 +329,7 @@ header {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #cee0d0;
+    background-color: #9FAEEA;
     flex-direction: column;
     align-items: center;
     display: none;
@@ -353,7 +374,7 @@ header {
   .nav-link:hover > a {
     transform: scale(1);
     /* background-color: var(--primary-color); */
-    background-color: #cee0d0;
+     background-color: #9FAEEA;
   }
  
   .dropdown,
@@ -367,7 +388,7 @@ header {
     width: 100%;
     padding: 0;
     /* background-color: var(--primary-color); */
-    background-color: #cee0d0;
+     background-color: #9FAEEA;
     display: none;
   }
 
@@ -419,7 +440,7 @@ header {
   }
 
   .dropdown-link:hover > a {
-    background-color: #2a492d;
+    background-color: #0b1332;
     /* background-color: var(--primary-color); */
   }
 
@@ -539,3 +560,14 @@ header {
 
 }
 
+/* Mobile hamburger toggle */
+@media (max-width: 920px) {
+ 
+
+  .hamburger-menu-container {
+    justify-content: flex-end; 
+    margin-right: -20px;/* left side alignment */
+  }
+
+  
+}
