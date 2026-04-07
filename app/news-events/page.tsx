@@ -36,7 +36,7 @@ export default function NewsEventsPage() {
   const [searchQuery] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+   
   const {
     register,
     handleSubmit,
@@ -222,14 +222,12 @@ reset();
               >
                 {/* Image & Status Tag */}
                 <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={
-                      event.cover_image || "/assets/images/default-event.jpg"
-                    }
-                    alt={event.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+               <Image
+  src={`/api/events/images/${event.cover_image?.split("/").pop()}`}
+  alt={event.title}
+  fill
+  className="object-cover group-hover:scale-105 transition-transform duration-500"
+/>
                   <div className="absolute top-4 left-4 flex gap-2">
                     <span className="px-3 py-1 bg-yellow-400/90 backdrop-blur-sm text-[10px] font-bold text-gray-800 uppercase tracking-widest rounded-md">
                       {event.status}

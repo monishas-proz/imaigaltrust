@@ -36,13 +36,13 @@ export async function POST(request: Request) {
       const bytes = await coverImageFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-const uploadDir = path.join(process.cwd(), "public/assets/images/events");
-      await mkdir(uploadDir, { recursive: true });
+const eventsDir = path.join(process.cwd(), "events");
+      await mkdir(eventsDir, { recursive: true });
 
       const fileName = `${Date.now()}-${coverImageFile.name.replace(/\s+/g, "-")}`;
 // coverImagePath = `/assets/images/events/${fileName}`;
-coverImagePath = `/assets/images/events/${fileName}`;
-      const fullPath = path.join(uploadDir, fileName);
+coverImagePath = `events/${fileName}`;
+      const fullPath = path.join(eventsDir, fileName);
 
       await writeFile(fullPath, buffer);
     }

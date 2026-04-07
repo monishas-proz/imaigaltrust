@@ -43,27 +43,41 @@ export async function POST(request: Request) {
 
         let file_path = null;
 
-        if (media_type === "image" && file) {
-            try {
-                const bytes = await file.arrayBuffer();
-                const buffer = Buffer.from(bytes);
+      if (media_type === "image" && file) {
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-                const galleryDir = path.join(process.cwd(), "public", "gallery");
-                await mkdir(galleryDir, { recursive: true });
+    // save in root gallery folder
+    const galleryDir = path.join(process.cwd(), "gallery");
 
-                const filename = `${Date.now()}-${file.name.replaceAll(" ", "_")}`;
-                const fullPath = path.join(galleryDir, filename);
-                file_path = `/gallery/${filename}`;
+    await mkdir(galleryDir, { recursive: true });
 
-                await writeFile(fullPath, buffer);
-            } catch (fileError) {
-                console.error("File Upload Error:", fileError);
-                return NextResponse.json(
-                    { message: "File upload failed", details: fileError instanceof Error ? fileError.message : "Unknown error" },
-                    { status: 500 }
-                );
-            }
-        }
+    const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
+
+    const fullPath = path.join(galleryDir, filename);
+
+    await writeFile(fullPath, buffer);
+
+   
+
+
+
+
+
+
+
+await writeFile(fullPath, buffer);
+
+file_path = filename;
+
+    // store only filename
+    file_path = filename;
+
+  } catch (error) {
+    console.error("File Upload Error:", error);
+  }
+}
 
         try {
             const newGalleryItem = await prisma.gallery.create({

@@ -433,6 +433,7 @@ Actions</th>
     <span className="text-gray-400 text-sm italic">No media</span>
   )}
 </td>
+
                   <td  className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     <div className="flex items-center  gap-2">
                       <button
@@ -483,21 +484,22 @@ Actions</th>
         ✕
       </button>
 
-      {previewItem.media_type === "image" && previewItem.file_path ? (
-        <Image
-          src={previewItem.file_path}
-          alt={previewItem.title}
-          width={600}
-          height={500}
-          className="w-full max-h-[60vh] object-contain"
-        />
-      ) : previewItem.media_type === "video" && previewItem.video_url ? (
-        <video controls className="w-full max-h-[500px]">
-          <source src={previewItem.video_url} type="video/mp4" />
-        </video>
-      ) : (
-        <p className="text-center text-gray-500">Media not available</p>
-      )}
+  {previewItem.media_type === "image" && previewItem.file_path ? (
+  <Image
+    src={`/api/gallery-image/${previewItem.file_path}`}
+    alt={previewItem.title}
+    width={600}
+    height={500}
+    className="w-full max-h-[60vh] object-contain"
+    unoptimized
+  />
+): previewItem.media_type === "video" && previewItem.video_url ? (
+  <video controls className="w-full max-h-[500px]">
+    <source src={previewItem.video_url} type="video/mp4" />
+  </video>
+) : (
+  <p className="text-center text-gray-500">Media not available</p>
+)}
     </div>
   </div>
 )}

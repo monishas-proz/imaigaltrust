@@ -241,14 +241,12 @@ function GalleryContent() {
                   {/* Media Container */}
                   {item.media_type === "image" ? (
                     <div className="relative w-full overflow-hidden">
-                      <Image
-                        src={item.file_path || "/defaultImages1.jpg"}
-                        alt={item.title}
-                        width={600}
-                        height={400}
-                        className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        style={{ height: "auto" }}
-                      />
+                    <Image
+  src={item.file_path ? `/api/gallery-image/${item.file_path}` : "/defaultImages1.jpg"}
+  alt={item.title}
+  width={600}
+  height={400}
+/>
                       {/* Zoom Overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
                         <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
@@ -315,15 +313,15 @@ function GalleryContent() {
             </button>
 
             {/* Media */}
-            {lightbox.media_type === "image" && lightbox.file_path ? (
-              <Image
-                src={lightbox.file_path}
-                alt={lightbox.title}
-                width={900}
-                height={600}
-                className="w-full object-contain max-h-[65vh]"
-              />
-            ) : lightbox.media_type === "video" ? (
+           {lightbox.media_type === "image" && lightbox.file_path ? (
+  <Image
+  src={lightbox.file_path ? `/api/gallery/${lightbox.file_path}` : "/defaultImages1.jpg"}
+  alt={lightbox.title}
+  width={900}
+  height={600}
+  className="w-full object-contain max-h-[65vh]"
+/>
+) : lightbox.media_type === "video" ? (
               <div className="aspect-video w-full bg-black">
                 {lightbox.video_url && getYouTubeId(lightbox.video_url) ? (
                   <iframe

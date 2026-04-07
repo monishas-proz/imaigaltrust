@@ -34,3 +34,86 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+Imaigal Trust Management System
+
+Tech Stack for imaigal-Trust:
+    Frontend:
+        Next.js
+        React
+        TypeScript
+        Tailwind CSS
+        React Hot Toast
+        Lucide Icons
+
+    Backend:
+        Node.js
+        Prisma ORM
+        MySql
+
+    Tools:
+        Git 
+        Github
+        Vs code 
+        Postman 
+
+Features:
+    Member Registration
+    Admin Approval System
+    Volunteer Management
+    Event Management
+    Membership Fee Tracking
+    Donation Management
+    Dashboard lists the count
+    Secure Login System
+    Responsive UI
+
+Admin Login:
+    Email: 
+    Password: 
+
+Project Structure:
+    imaigal-trust 
+    ├── app 
+    | ├── login 
+    | ├── dashboard 
+    | ├── members 
+    | ├── events
+    | └── api 
+      └──
+    ├── components 
+    ├── prisma 
+     └── schema.prisma 
+    ├── public 
+    ├── styles 
+    └── README.md
+
+Installation:
+    Clone Repository:
+        git clone https://github.com/your-username/imaigal-trust.git
+
+    Go to Project Folder:
+        cd imaigal-trust
+
+    Install Dependencies
+        npm install
+
+Environment Variables:
+    Create .env file in the root folder.
+    DATABASE_URL="mysql://root:password@localhost:3306/imaigal_trust" NEXTAUTH_SECRET=your_secret_key 
+
+Prisma Setup:
+    Generate Prisma Client
+    npx prisma generate
+    Run Database Migration
+    npx prisma migrate dev
+
+
+Run the Project
+    npm run dev
+    Open in browser : http://localhost:3000
+
+Live Demo
+    Deployment Link: https://imaigaltrust.vercel.app/
+

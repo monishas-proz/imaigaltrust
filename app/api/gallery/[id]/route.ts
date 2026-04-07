@@ -5,95 +5,109 @@ import path from "path";
 
 // PUT - Update gallery item
 export async function PUT(
-    req: Request,
-    { params }: { params: Promise<{ id: string }> }
+  req: Request,
+  { params }: { params: { id: string } }
 ) {
-    try {
-        const { id: idParam } = await params;
-        const id = parseInt(idParam);
-        const formData = await req.formData();
+  try {
 
-        const programIdRaw = formData.get("programId");
-        const categoryIdRaw = formData.get("categoryId");
+    const id = parseInt(params.id);
+    const formData = await req.formData();
 
-        if (!programIdRaw || !categoryIdRaw) {
-            return NextResponse.json(
-                { message: "Please select a Program and Category" },
-                { status: 400 }
-            );
-        }
+    const program_id = parseInt(formData.get("programId") as string);
+    const category_id = parseInt(formData.get("categoryId") as string);
 
-        const program_id = parseInt(programIdRaw as string);
-        const category_id = parseInt(categoryIdRaw as string);
+    const year = formData.get("year") as string;
+    const month = formData.get("month") as string || null;
+    const title = formData.get("title") as string;
+    const media_type = formData.get("mediaType") as string;
+    const description = formData.get("description") as string || null;
+    const video_url = formData.get("videoUrl") as string || null;
+    const file = formData.get("file") as File | null;
 
-        const year = formData.get("year") as string;
-        const month = formData.get("month") as string || null;
-        const title = formData.get("title") as string;
-        const media_type = formData.get("mediaType") as string;
-        const description = formData.get("description") as string || null;
-        const video_url = formData.get("videoUrl") as string || null;
-        const file = formData.get("file") as File | null;
-
-        if (!title || !year) {
-            return NextResponse.json(
-                { message: "Title and Year are required" },
-                { status: 400 }
-            );
-        }
-
-        // Get existing record to handle file replacement
-        const existing = await prisma.gallery.findUnique({ where: { id } });
-        let file_path = existing?.file_path || null;
-
-        if (media_type === "image" && file && file.size > 0) {
-            // Delete old file if exists
-            if (existing?.file_path) {
-                try {
-                    const oldPath = path.join(process.cwd(), "public", existing.file_path);
-                    await unlink(oldPath);
-                } catch { /* ignore if file not found */ }
-            }
-
-            // Save new file
-            const bytes = await file.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-            const galleryDir = path.join(process.cwd(), "public", "gallery");
-            await mkdir(galleryDir, { recursive: true });
-            const filename = `${Date.now()}-${file.name.replaceAll(" ", "_")}`;
-            const fullPath = path.join(galleryDir, filename);
-            file_path = `/gallery/${filename}`;
-            await writeFile(fullPath, buffer);
-        }
-
-        // If switched to video, clear file_path
-        if (media_type === "video") {
-            file_path = null;
-        }
-
-        const updated = await prisma.gallery.update({
-            where: { id },
-            data: {
-                program_id,
-                category_id,
-                year,
-                month,
-                title,
-                media_type,
-                description,
-                file_path,
-                video_url: media_type === "video" ? video_url : null,
-            },
-        });
-
-        return NextResponse.json({ message: "Updated successfully", data: updated });
-    } catch (error) {
-        console.error("Error updating gallery item:", error);
-        return NextResponse.json(
-            { error: "Failed to update", details: error instanceof Error ? error.message : "Unknown error" },
-            { status: 500 }
-        );
+    if (!title || !year) {
+      return NextResponse.json(
+        { message: "Title and Year required" },
+        { status: 400 }
+      );
     }
+
+    // existing record
+    const existing = await prisma.gallery.findUnique({
+      where: { id }
+    });
+
+    let file_path = existing?.file_path || null;
+
+    // upload new image
+    if (media_type === "image" && file && file.size > 0) {
+
+      const galleryDir = path.join(process.cwd(), "gallery");
+      await mkdir(galleryDir, { recursive: true });
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
+      const fullPath = path.join(galleryDir, filename);
+
+      await writeFile(fullPath, buffer);
+
+
+      
+
+
+
+
+
+await writeFile(fullPath, buffer);
+
+file_path = filename;
+      // delete old image
+      if (existing?.file_path) {
+        const oldFile = path.join(galleryDir, existing.file_path);
+        try {
+          await unlink(oldFile);
+        } catch {}
+      }
+
+      file_path = filename;
+    }
+
+    // if video selected
+    if (media_type === "video") {
+      file_path = null;
+    }
+
+    const updated = await prisma.gallery.update({
+      where: { id },
+      data: {
+        program_id,
+        category_id,
+        year,
+        month,
+        title,
+        media_type,
+        description,
+        file_path,
+        video_url: media_type === "video" ? video_url : null
+      }
+    });
+
+    return NextResponse.json({
+      message: "Updated successfully",
+      data: updated
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Failed to update" },
+      { status: 500 }
+    );
+  }
 }
+
 
 // DELETE - Soft delete (set status = 0)
 export async function DELETE(

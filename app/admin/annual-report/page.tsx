@@ -375,14 +375,14 @@ export default function AnnualReportFormPage() {
                     <td className="px-12 py-4 text-gray-600 capitalize">{r.language}</td>
                     <td className="px-8 py-4">
                       <a
-                        href={r.file_path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-blue-700 font-semibold text-sm rounded-lg transition"
-                      >
-                        <FileText size={16} />
-                        View
-                      </a>
+  href={`/api/annual-report/file/${r.file_path}`} 
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 px-3 py-1.5 text-blue-700 font-semibold text-sm rounded-lg transition"
+>
+  <FileText size={16} />
+  View
+</a>
                     </td>
                     <td className="px-8 py-4 text-right">
                       <button
