@@ -3,20 +3,16 @@ import prisma from "@/lib/prisma";
 import { writeFile, mkdir, unlink } from "fs/promises";
 import path from "path";
 
-// PUT - Update gallery item
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: idParam } = await params;
-    const id = parseInt(idParam, 10);
+    const { id } = await params;
+    const galleryId = parseInt(id, 10);
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: "Invalid ID" },
-        { status: 400 }
-      );
+    if (isNaN(galleryId)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
     const formData = await req.formData();
@@ -39,9 +35,8 @@ export async function PUT(
       );
     }
 
-    // existing record
     const existing = await prisma.gallery.findUnique({
-      where: { id }
+      where: { id: galleryId },
     });
 
     if (!existing) {
@@ -53,7 +48,6 @@ export async function PUT(
 
     let file_path = existing.file_path || null;
 
-    // upload new image
     if (media_type === "image" && file && file.size > 0) {
       const galleryDir = path.join(process.cwd(), "gallery");
 
@@ -67,7 +61,6 @@ export async function PUT(
 
       await writeFile(fullPath, buffer);
 
-      // delete old image
       if (existing.file_path) {
         const oldFile = path.join(galleryDir, existing.file_path);
         try {
@@ -78,13 +71,12 @@ export async function PUT(
       file_path = filename;
     }
 
-    // if video selected
     if (media_type === "video") {
       file_path = null;
     }
 
     const updated = await prisma.gallery.update({
-      where: { id },
+      where: { id: galleryId },
       data: {
         program_id,
         category_id,
@@ -94,59 +86,45 @@ export async function PUT(
         media_type,
         description,
         file_path,
-        video_url: media_type === "video" ? video_url : null
-      }
+        video_url: media_type === "video" ? video_url : null,
+      },
     });
 
     return NextResponse.json({
       message: "Updated successfully",
-      data: updated
+      data: updated,
     });
-
   } catch (error) {
     console.error(error);
-
-    return NextResponse.json(
-      { error: "Failed to update" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
 
-
-// DELETE - Soft delete (set status = -1)
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: idParam } = await params;
-    const id = parseInt(idParam, 10);
+    const { id } = await params;
+    const galleryId = parseInt(id, 10);
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: "Invalid ID" },
-        { status: 400 }
-      );
+    if (isNaN(galleryId)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
     await prisma.gallery.update({
-      where: { id },
+      where: { id: galleryId },
       data: { status: -1 },
     });
 
     return NextResponse.json({
-      message: "Deleted successfully (soft delete)"
+      message: "Deleted successfully (soft delete)",
     });
-
   } catch (error) {
-    console.error("Error soft-deleting gallery item:", error);
+    console.error("Error deleting gallery:", error);
 
     return NextResponse.json(
-      {
-        error: "Failed to delete",
-        details: error instanceof Error ? error.message : "Unknown error"
-      },
+      { error: "Failed to delete" },
       { status: 500 }
     );
   }

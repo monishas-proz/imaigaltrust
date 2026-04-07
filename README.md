@@ -109,7 +109,9 @@ Prisma Setup:
     Run Database Migration
     npx prisma migrate dev
 
-
+Toast Setup:
+    npm install react-hot-toast
+    
 Run the Project
     npm run dev
     Open in browser : http://localhost:3000
