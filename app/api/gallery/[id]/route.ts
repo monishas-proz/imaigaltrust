@@ -6,22 +6,30 @@ import path from "path";
 // PUT - Update gallery item
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: idParam } = await params;
+    const id = parseInt(idParam, 10);
 
-    const id = parseInt(params.id);
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { message: "Invalid ID" },
+        { status: 400 }
+      );
+    }
+
     const formData = await req.formData();
 
     const program_id = parseInt(formData.get("programId") as string);
     const category_id = parseInt(formData.get("categoryId") as string);
 
     const year = formData.get("year") as string;
-    const month = formData.get("month") as string || null;
+    const month = (formData.get("month") as string) || null;
     const title = formData.get("title") as string;
     const media_type = formData.get("mediaType") as string;
-    const description = formData.get("description") as string || null;
-    const video_url = formData.get("videoUrl") as string || null;
+    const description = (formData.get("description") as string) || null;
+    const video_url = (formData.get("videoUrl") as string) || null;
     const file = formData.get("file") as File | null;
 
     if (!title || !year) {
@@ -36,12 +44,19 @@ export async function PUT(
       where: { id }
     });
 
-    let file_path = existing?.file_path || null;
+    if (!existing) {
+      return NextResponse.json(
+        { message: "Gallery item not found" },
+        { status: 404 }
+      );
+    }
+
+    let file_path = existing.file_path || null;
 
     // upload new image
     if (media_type === "image" && file && file.size > 0) {
-
       const galleryDir = path.join(process.cwd(), "gallery");
+
       await mkdir(galleryDir, { recursive: true });
 
       const bytes = await file.arrayBuffer();
@@ -52,18 +67,8 @@ export async function PUT(
 
       await writeFile(fullPath, buffer);
 
-
-      
-
-
-
-
-
-await writeFile(fullPath, buffer);
-
-file_path = filename;
       // delete old image
-      if (existing?.file_path) {
+      if (existing.file_path) {
         const oldFile = path.join(galleryDir, existing.file_path);
         try {
           await unlink(oldFile);
@@ -109,26 +114,40 @@ file_path = filename;
 }
 
 
-// DELETE - Soft delete (set status = 0)
+// DELETE - Soft delete (set status = -1)
 export async function DELETE(
-    req: Request,
-    { params }: { params: Promise<{ id: string }> }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id: idParam } = await params;
-        const id = parseInt(idParam);
+  try {
+    const { id: idParam } = await params;
+    const id = parseInt(idParam, 10);
 
-        await prisma.gallery.update({
-            where: { id },
-            data: { status: -1 },
-        });
-
-        return NextResponse.json({ message: "Deleted successfully (soft delete)" });
-    } catch (error) {
-        console.error("Error soft-deleting gallery item:", error);
-        return NextResponse.json(
-            { error: "Failed to delete", details: error instanceof Error ? error.message : "Unknown error" },
-            { status: 500 }
-        );
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { message: "Invalid ID" },
+        { status: 400 }
+      );
     }
+
+    await prisma.gallery.update({
+      where: { id },
+      data: { status: -1 },
+    });
+
+    return NextResponse.json({
+      message: "Deleted successfully (soft delete)"
+    });
+
+  } catch (error) {
+    console.error("Error soft-deleting gallery item:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to delete",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
 }
