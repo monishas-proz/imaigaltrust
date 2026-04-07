@@ -197,62 +197,75 @@ const handleReject = async () => {
               </thead>
               <tbody>
                 {currentData.map((member, index) => (
-                  <tr
-                    key={member.id}
-                    className="border-b hover:bg-gray-50 transition"
-                  >
-                    <td className="px-3 py-2">{startIndex + index + 1}</td>
-                    <td className="px-3 py-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedMembers.includes(member.id)}
-                        onChange={(e) =>
-                          e.target.checked
-                            ? setSelectedMembers([...selectedMembers, member.id])
-                            : setSelectedMembers(
-                                selectedMembers.filter((id) => id !== member.id)
-                              )
-                        }
-                        disabled={member.status !== "pending"}
-                        className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                      />
-                    </td>
-                    <td className="px-3 py-2">{member.name}</td>
-                    <td className="px-3 py-2">
-                      {member.email} <br />
-                      <span className="text-gray-400">{member.mobile}</span>
-                    </td>
-                    <td className="px-3 py-2">
-                      {member.city}, {member.state}
-                    </td>
-                    <td className="px-3 py-2">{member.membership_type}</td>
-                    <td className="px-3 py-2">
-                      {member.voluntaryDonation > 0
-                        ? `₹${member.voluntaryDonation}`
-                        : "Free"}
-                    </td>
-                    <td className="px-3 py-2">
-                      {member.status === "approved" && (
-                        <span className="bg-green-900 text-white px-2 py-1 rounded-full text-xs">
-                          Approved
-                        </span>
-                      )}
-                      {member.status === "pending" && (
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
-                          Pending
-                        </span>
-                      )}
-                      {member.status === "rejected" && (
-                        <span className="bg-red-800 text-white px-2 py-1 rounded-full text-xs">
-                          Rejected
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2">
-                      {new Date(member.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
+  <tr
+    key={member.id}
+    className="border-b hover:bg-gray-50 transition"
+  >
+    {/* Index */}
+    <td className="px-3 py-2">{startIndex + index + 1}</td>
+
+    {/* Checkbox */}
+    <td className="px-3 py-2">
+      <input
+        type="checkbox"
+        checked={selectedMembers.includes(member.id)}
+        onChange={(e) =>
+          e.target.checked
+            ? setSelectedMembers([...selectedMembers, member.id])
+            : setSelectedMembers(
+                selectedMembers.filter((id) => id !== member.id)
+              )
+        }
+        disabled={member.status !== "pending"}
+        className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
+      />
+    </td>
+
+    {/* Name */}
+    <td className="px-3 py-2">{member.name}</td>
+
+    {/* Email & Mobile */}
+    <td className="px-3 py-2">
+      {member.email} <br />
+      <span className="text-gray-400">{member.mobile}</span>
+    </td>
+
+    {/* City & State */}
+    <td className="px-3 py-2">
+      {member.city}, {member.state}
+    </td>
+
+    {/* Membership Type */}
+    <td className="px-3 py-2">{member.membership_type}</td>
+
+    {/* Voluntary Donation */}
+    <td className="px-3 py-2">
+      {member.voluntaryDonation > 0
+        ? `₹${member.voluntaryDonation}`
+        : "Free"}
+    </td>
+
+    {/* Status Badge */}
+    <td className="px-3 py-2">
+      <span
+        className={`px-2 py-1 rounded-full text-xs ${
+          member.status === "approved"
+            ? "bg-green-100 text-green-800"
+            : member.status === "rejected"
+            ? "bg-red-100 text-red-800"
+            : "bg-yellow-100 text-yellow-800"
+        }`}
+      >
+        {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+      </span>
+    </td>
+
+    {/* Created Date */}
+    <td className="px-3 py-2">
+      {new Date(member.created_at).toLocaleDateString()}
+    </td>
+  </tr>
+))}
               </tbody>
             </table>
           </div>

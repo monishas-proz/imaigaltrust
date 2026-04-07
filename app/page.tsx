@@ -280,7 +280,7 @@ export default function Home() {
       </div>
 
       {/* OUR IMPACT CONTAINER */}
-      <div className="my-5  p-5 md:px-10 our-impact-container max-w-[1600px] mx-auto ">
+      <div className="my-5  p-5 md:px-10 our-impact-container max-w-[1620px] mx-auto ">
         <div>
           <Text
             title="Our Impact (2020 - 2025)"
