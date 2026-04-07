@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Trash2, X, Plus, FileText } from "lucide-react";
 import toast from "react-hot-toast";
+
 import Pagination from "@/app/component/Pagination/Pagination";
 import ConfirmDeleteModal from "@/app/component/DeleteModal/ConfirmDeleteModal";
 interface Report {
@@ -375,14 +376,14 @@ export default function AnnualReportFormPage() {
                     <td className="px-12 py-4 text-gray-600 capitalize">{r.language}</td>
                     <td className="px-8 py-4">
                       <a
-                        href={r.file_path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-blue-700 font-semibold text-sm rounded-lg transition"
-                      >
-                        <FileText size={16} />
-                        View
-                      </a>
+  href={`/api/annual-report/file/${r.file_path}`} 
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 px-3 py-1.5 text-blue-700 font-semibold text-sm rounded-lg transition"
+>
+  <FileText size={16} />
+  View
+</a>
                     </td>
                     <td className="px-8 py-4 text-right">
                       <button

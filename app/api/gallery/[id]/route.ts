@@ -6,8 +6,8 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 export async function PUT(
-    req: Request,
-    { params }: { params: Promise<{ id: string }> }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
     if (process.env.NEXT_PHASE === 'phase-production-build' || process.env.VERCEL === '1' && !process.env.DATABASE_URL) {
         return NextResponse.json({ message: "Build phase" });
@@ -47,6 +47,67 @@ export async function PUT(
             { status: 500 }
         );
     }
+
+    let file_path = existing.file_path || null;
+
+    // upload new image
+    if (media_type === "image" && file && file.size > 0) {
+      const galleryDir = path.join(process.cwd(), "gallery");
+
+      await mkdir(galleryDir, { recursive: true });
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
+      const fullPath = path.join(galleryDir, filename);
+
+      await writeFile(fullPath, buffer);
+
+      // delete old image
+      if (existing.file_path) {
+        const oldFile = path.join(galleryDir, existing.file_path);
+        try {
+          await unlink(oldFile);
+        } catch {}
+      }
+
+      file_path = filename;
+    }
+
+    // if video selected
+    if (media_type === "video") {
+      file_path = null;
+    }
+
+    const updated = await prisma.gallery.update({
+      where: { id },
+      data: {
+        program_id,
+        category_id,
+        year,
+        month,
+        title,
+        media_type,
+        description,
+        file_path,
+        video_url: media_type === "video" ? video_url : null
+      }
+    });
+
+    return NextResponse.json({
+      message: "Updated successfully",
+      data: updated
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Failed to update" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(
@@ -77,4 +138,25 @@ export async function DELETE(
             { status: 500 }
         );
     }
+
+    await prisma.gallery.update({
+      where: { id },
+      data: { status: -1 },
+    });
+
+    return NextResponse.json({
+      message: "Deleted successfully (soft delete)"
+    });
+
+  } catch (error) {
+    console.error("Error soft-deleting gallery item:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to delete",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
 }
