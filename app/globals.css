@@ -200,7 +200,7 @@ nav::-webkit-scrollbar-thumb {
 }
 
 /* show scrollbar clearly */
-.overflow-x-scroll::-webkit-scrollbar {
+/* .overflow-x-scroll::-webkit-scrollbar {
   height: 10px;
 }
 
@@ -211,14 +211,14 @@ nav::-webkit-scrollbar-thumb {
 
 .overflow-x-scroll::-webkit-scrollbar-track {
   background: #f1f1f1;
-}
+} */
 /* enable horizontal scroll */
-.overflow-x-scrollbar {
+/* .overflow-x-scrollbar {
   overflow-x: auto;
-}
+} */
 
 /* show horizontal scrollbar */
-.overflow-x-scrollbar::-webkit-scrollbar {
+/* .overflow-x-scrollbar::-webkit-scrollbar {
   height: 10px;
 }
 
@@ -227,11 +227,11 @@ nav::-webkit-scrollbar-thumb {
 }
 
 .overflow-x-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #7c3939;
   border-radius: 5px;
-}
+} */
 
 /* force table width so scrollbar appears */
-.overflow-x-scrollbar table {
+/* .overflow-x-scrollbar table {
   min-width: 900px;
-}
+} */

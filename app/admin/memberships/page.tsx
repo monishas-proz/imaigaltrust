@@ -136,7 +136,7 @@ export default function AdminMembershipsPage() {
       <button
         onClick={handleApprove}
         disabled={selectedMembers.length === 0}
-        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-semibold w-full md:w-auto"
+        className="px-4 py-2 bg-green-900 text-white rounded-lg hover:bg-green-900 text-sm font-semibold w-full md:w-auto"
       >
         Approve
       </button>
@@ -199,11 +199,11 @@ export default function AdminMembershipsPage() {
             <td className=" py-2 text-xs">{m.voluntaryDonation > 0 ? `₹${m.voluntaryDonation}` : "Free"}</td>
             <td className=" py-2">
               <span
-                className={` py-1 rounded-full text-xs ${
+                className={` py-2 rounded-full text-xs ${
                   m.status === "approved"
-                    ? "bg-green-100 text-green-800"
+                    ? "bg-green-900 text-white"
                     : m.status === "rejected"
-                    ? "bg-red-100 text-red-800"
+                    ? "bg-red-900 text-white"
                     : "bg-yellow-100 text-yellow-800"
                 }`}
               >

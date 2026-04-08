@@ -63,9 +63,9 @@ function validate(vals: Partial<typeof form> = form) {
     } else if (!reName.test(vals.name)) {
       tmp.name = "Name allows only letters";
     } else if (vals.name.trim().length < 3) {
-      tmp.name = "Name must be at least 3 characters";
+      tmp.name = " Invalid Name";
     } else if (vals.name.trim().length > 15) {
-      tmp.name = "Name cannot exceed 15 characters";
+      tmp.name = " Invalid Name";
     } else {
       tmp.name = "";
     }
@@ -103,7 +103,7 @@ function validate(vals: Partial<typeof form> = form) {
     if (!vals.mobile) {
       tmp.mobile = "Mobile number is required";
     } else if (!/^[6-9]\d{9}$/.test(vals.mobile)) {
-      tmp.mobile = "Mobile must start with 6,7,8 or 9 and be 10 digits";
+      tmp.mobile = "Invalid mobile number";
     } else {
       tmp.mobile = "";
     }
@@ -114,7 +114,7 @@ function validate(vals: Partial<typeof form> = form) {
     if (!vals.address?.trim()) {
       tmp.address = "Address is required";
     } else if (vals.address.trim().length < 3) {
-      tmp.address = "Address must be at least 3 characters";
+      tmp.address = "Invalid Address ";
     } else {
       tmp.address = "";
     }
@@ -125,7 +125,7 @@ function validate(vals: Partial<typeof form> = form) {
     if (!vals.city?.trim()) {
       tmp.city = "City is required";
     } else if (!reCity.test(vals.city)) {
-      tmp.city = "City allows only alphabets";
+      tmp.city = "Invalid City ";
     } else {
       tmp.city = "";
     }
@@ -784,19 +784,19 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
       <span className="text-gray-700">Free</span>
 
       <label className="relative inline-flex items-center cursor-pointer">
-       <input
-  type="checkbox"
-  className="sr-only peer"
-  checked={isPaidDonation}
-  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPaid = e.target.checked;
-    setIsPaidDonation(newPaid);
-    setForm((prevForm) => ({
-      ...prevForm,
-      voluntaryDonation: newPaid ? "1000" : "", // string
-    }));
-  }}
-/>
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={isPaidDonation}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const newPaid = e.target.checked;
+            setIsPaidDonation(newPaid);
+            setForm((prevForm) => ({
+              ...prevForm,
+              voluntaryDonation: newPaid ? "1000" : "", // string
+            }));
+          }}
+        />
         <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-500 transition-all"></div>
         <div
           className={`absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-all ${
@@ -808,40 +808,43 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
       <span className="text-gray-700">Paid</span>
     </div>
 
-    <input
-  name="voluntaryDonation"
-  type="number"
-  min="1000"
-  required={isPaidDonation}
-  value={form.voluntaryDonation}
-  onChange={(e) => {
-    let value = e.target.value;
+    {isPaidDonation && (
+      <>
+        <input
+          name="voluntaryDonation"
+          type="number"
+          min="1000"
+          required={isPaidDonation}
+          value={form.voluntaryDonation}
+          onChange={(e) => {
+            let value = e.target.value;
 
-    // remove leading 0
-    if (value === "0") value = "";
+            // remove leading 0
+            if (value === "0") value = "";
 
-    setForm((prev) => ({
-      ...prev,
-      voluntaryDonation: value,
-    }));
-  }}
-  placeholder="₹1000"
-  disabled={!isPaidDonation}
-  className={`mt-1 w-full max-w-[386px] h-[56px] px-3 rounded-md border focus:outline-none ${
-    errors.voluntaryDonation
-      ? "border-red-500"
-      : !isPaidDonation
-      ? "bg-gray-100 cursor-not-allowed"
-      : "border-gray-300"
-  }`}
-/>
+            setForm((prev) => ({
+              ...prev,
+              voluntaryDonation: value,
+            }));
+          }}
+          placeholder="₹1000"
+          className={`mt-1 w-full max-w-[386px] h-[56px] px-3 rounded-md border focus:outline-none ${
+            errors.voluntaryDonation
+              ? "border-red-500"
+              : "border-gray-300"
+          }`}
+        />
 
-{errors.voluntaryDonation && (
-  <p className="mt-1 text-sm text-red-600">
-    {errors.voluntaryDonation}
-  </p>
-)}
+        {errors.voluntaryDonation && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.voluntaryDonation}
+          </p>
+        )}
+      </>
+    )}
   </div>
+
+
 
   <button
   type="submit"
