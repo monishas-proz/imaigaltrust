@@ -21,6 +21,8 @@ const MembershipForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
+  
+
   const membershipTypes = [
     "Individual Member",
     "Corporate/Institutional Member",
@@ -32,7 +34,7 @@ const MembershipForm: React.FC = () => {
   const todayISO = new Date().toISOString().split("T")[0];
   const reName = /^[A-Za-z\s]+$/;
   const reCity = /^[A-Za-z\s]+$/;
-
+  
   function convertDOB(dob: string) {
     const [dd, mm, yyyy] = dob.split("/");
     return `${yyyy}-${mm}-${dd}`;
@@ -73,10 +75,10 @@ function validate(vals: Partial<typeof form> = form) {
 
   // DOB
   if ("dob" in vals) {
-    if (!vals.dob) {
-      tmp.dob = "Date of Birth is required";
-    } else {
-      const d = parseDDMMYYYY(vals.dob);
+  if (!vals.dob) {
+    tmp.dob = "Date of Birth is required";
+  } else {
+    const d = parseDDMMYYYY(vals.dob);
       if (!d) {
         tmp.dob = "Invalid format (DD/MM/YYYY)";
       } else if (d > new Date()) {
@@ -84,8 +86,8 @@ function validate(vals: Partial<typeof form> = form) {
       } else {
         tmp.dob = "";
       }
-    }
   }
+}
 
   // Email
   if ("email" in vals) {
@@ -147,26 +149,19 @@ function validate(vals: Partial<typeof form> = form) {
     tmp.state = vals.state ? "" : "Please select a state";
   }
 
-  // Membership Type
   if ("membershipType" in vals) {
-    tmp.membershipType = vals.membershipType
-      ? ""
-      : "Please select a Membership Type";
-  }
+  tmp.membershipType = vals.membershipType ? "" : "Please select a Membership Type";
+}
 
-  // Area of Interest
-  if ("interest" in vals) {
-    tmp.interest = vals.interest
-      ? ""
-      : "Please select an Area of Interest";
-  }
-
+if ("interest" in vals) {
+  tmp.interest = vals.interest ? "" : "Please select an Area of Interest";
+}
   // Membership Fee
-  if ("fee" in vals) {
-    tmp.fee = vals.fee
-      ? ""
-      : "Please select a Membership Fee";
-  }
+  // if ("fee" in vals) {
+  //   tmp.fee = vals.fee
+  //     ? ""
+  //     : "Please select a Membership Fee";
+  // }
 
   setErrors(tmp);
   return Object.values(tmp).every((x) => x === "");
@@ -186,34 +181,35 @@ const handleSubmit = async (e: React.FormEvent) => {
     toast.error(" Minimum donation amount is ₹1000 for paid donations.");
     setIsSubmitting(false);
     return;
-  }
+}
 
   const isValid = validate();
   const newErrors: Record<string, string> = {};
-
   if (!form.membershipType) newErrors.membershipType = "Please select a Membership Type";
-  if (!form.interest) newErrors.interest = "Please select an Area of Interest";
-  if (!form.fee) newErrors.fee = "Please select a Membership Fee";
+if (!form.interest) newErrors.interest = "Please select an Area of Interest";
+  // if (!form.membershipType) newErrors.membershipType = "Please select a Membership Type";
+  // if (!form.interest) newErrors.interest = "Please select an Area of Interest";
+  // if (!form.fee) newErrors.fee = "Please select a Membership Fee";
 
   if (!isValid || Object.keys(newErrors).length > 0) {
-    setErrors((prev) => ({ ...prev, ...newErrors }));
-    toast.error(" Please fix the errors before submitting the form.");
-    setIsSubmitting(false);
-    return;
-  }
+  setErrors((prev) => ({ ...prev, ...newErrors }));
+  toast.error(" Please fix the errors before submitting the form.");
+  setIsSubmitting(false);
+  return;
+}
 
   try {
     const res = await fetch("/api/membership", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        donation_type: isPaidDonation ? "Paid" : "Free",
-        voluntaryDonation: isPaidDonation ? Number(form.voluntaryDonation) : 0,
-        approved: false,
-        dob: convertDOB(form.dob),
-      }),
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...form,
+    donation_type: isPaidDonation ? "Paid" : "Free",
+    voluntaryDonation: isPaidDonation ? Number(form.voluntaryDonation) : 0,
+    approved: false,
+    dob: convertDOB(form.dob),
+  }),
+});
 
     const data = await res.json();
 
@@ -419,7 +415,7 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
         ref={dateRef}
         className="hidden"
         max={todayISO}
-        onChange={handleDatePick}
+        onChange={handleDatePick} 
       />
 
       <section className="py-12 px-4 md:px-20">
@@ -740,7 +736,7 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
           </fieldset>
           <hr className="border-t border-gray-200 my-8" />
 
-          <fieldset className="pt-2 ">
+          {/* <fieldset className="pt-2 ">
             <legend className="text-base font-medium text-gray-900 text-[16px]">
               Membership Type<span className="text-red-500">&#42;</span>
             </legend>
@@ -770,7 +766,7 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
             {errors.fee && (
   <p className="mt-1 text-sm text-red-600">{errors.fee}</p>
 )}
-          </fieldset>
+          </fieldset> */}
 
           {/* Donation + Submit */}
          
@@ -797,7 +793,7 @@ const handleCheckboxChange = (name: keyof typeof form, value: string) => {
             }));
           }}
         />
-        <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-500 transition-all"></div>
+        <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-800 transition-all"></div>
         <div
           className={`absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-all ${
             isPaidDonation ? "translate-x-5" : "translate-x-0"

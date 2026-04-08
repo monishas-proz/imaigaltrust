@@ -81,7 +81,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      id: result.id
+      message: "Created Member Successfully"
     });
   } catch (error) {
     const err = error as Error;

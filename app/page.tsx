@@ -8,7 +8,7 @@ import StatCard from "./component/Home/StatCard/StatCard";
 import EventCard from "./component/Home/EventCard/EventCard";
 import HeroBanner from "./component/Home/HeroBanner/HeroBanner";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Timeline from "./component/Home/Timeline/Timeline";
 import SectionHeading from "./component/Common/SectionHeading";
@@ -37,6 +37,19 @@ export default function Home() {
   //     setImageContainer(data);
 
   // }, []);
+  const [events, setEvents] = useState([]);
+
+useEffect(() => {
+  const fetchEvents = async () => {
+    const res = await fetch("/api/events");
+    const data = await res.json();
+    if (data.events) {
+      setEvents(data.events);
+    }
+  };
+
+  fetchEvents();
+}, []);
 
   const scrollerRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +81,15 @@ export default function Home() {
       scroller.removeEventListener("mouseleave", handleHoverEnd);
     };
   }, []);
+
+  const ongoingEvents = events
+  .filter((e: any) => e.status === "ongoing")
+  .sort(
+    (a: any, b: any) =>
+      new Date(b.start_date).getTime() -
+      new Date(a.start_date).getTime()
+  );
+  
   return (
     <>
       {/* <PageBanner title="Home" list={breadcrumbs} /> */}
@@ -77,48 +99,43 @@ export default function Home() {
         <div className="flex bg-tint-400">
           <span className=" bg-accent-800 px-5 text-xs md:text-base py-1  2xl:py-2 md:px-10 md:py-2 flex items-center  font-700  text-white josefin-font uppercase rounded-br-4xl">
             <span>Latest News</span>
-            <span>
-              {React.cloneElement(<MdKeyboardArrowRight />, { size: 18 })}
-            </span>
-          </span>
-          <span className=" flex-1   py-1  2xl:py-2 md:px-10 md:py-2 overflow-x-hidden">
-            <div className="w-full overflow-hidden bg-gray-100 py-1">
-              <div
-                ref={scrollerRef}
-                className="inline-flex items-center gap-6 whitespace-nowrap animate-infinite-scroll"
-              >
-                {/* Item 1 */}
-                <Image
-                  src="/assets/images/home/star.svg"
-                  alt="Event"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 flex-shrink-0 rounded-full"
-                />
-                <span className="text-sm font-medium text-gray-800 md:text-base">
-                  Coir Cluster Development Workshop –
-                </span>
-                <span className="text-sm font-semibold italic accent-text-800 md:text-base">
-                  FEB 20th 2025
-                </span>
+<span>
+  {React.cloneElement(<MdKeyboardArrowRight />, { size: 18 })}
+</span>
+</span>
 
-                {/* Item 2 */}
-                <Image
-                  src="/assets/images/home/star.svg"
-                  alt="Event"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 flex-shrink-0 rounded-full"
-                />
-                <span className="text-sm font-medium text-gray-800 md:text-base">
-                  Women Entrepreneurship & Skill Development Program –
-                </span>
-                <span className="text-sm font-semibold italic accent-text-800  md:text-base">
-                  March 10, 2025
-                </span>
-              </div>
-            </div>
+<span className="flex-1 py-1 2xl:py-2 md:px-10 md:py-2 overflow-x-hidden">
+  <div className="w-full overflow-hidden bg-gray-100 py-1">
+    
+    <div
+      ref={scrollerRef}
+      className="inline-flex items-center gap-6 whitespace-nowrap animate-infinite-scroll"
+    >
+      {ongoingEvents.map((event: any) => (
+        <React.Fragment key={event.id}>
+          
+          <Image
+            src="/assets/images/home/star.svg"
+            alt="Event"
+            width={24}
+            height={24}
+            className="h-6 w-6 flex-shrink-0 rounded-full"
+          />
+
+          <span className="text-sm font-medium text-gray-800 md:text-base">
+            {event.title} –
           </span>
+
+          <span className="text-sm font-semibold italic accent-text-800 md:text-base">
+            {new Date(event.start_date).toLocaleDateString("en-IN")}
+          </span>
+
+        </React.Fragment>
+      ))}
+    </div>
+
+  </div>
+</span>
         </div>
       </div>
       {/* VISION AND MISSION CONTAINER */}

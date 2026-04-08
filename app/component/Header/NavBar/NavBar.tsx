@@ -7,6 +7,9 @@ import "./NavBar.css";
 import Image from "next/image";
 import { TbHome } from "react-icons/tb";
 
+
+
+// Rest of your Navbar code...
 const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
