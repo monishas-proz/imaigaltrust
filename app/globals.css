@@ -192,9 +192,46 @@ nav::-webkit-scrollbar {
   width: 6px;
 }
 nav::-webkit-scrollbar-track {
-  background: transparent;
+  background: black;
 }
 nav::-webkit-scrollbar-thumb {
   background-color: rgb(201, 188, 188);
   border-radius: 5px;
+}
+
+/* show scrollbar clearly */
+.overflow-x-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.overflow-x-scroll::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.overflow-x-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+/* enable horizontal scroll */
+.overflow-x-scrollbar {
+  overflow-x: auto;
+}
+
+/* show horizontal scrollbar */
+.overflow-x-scrollbar::-webkit-scrollbar {
+  height: 10px;
+}
+
+.overflow-x-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.overflow-x-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* force table width so scrollbar appears */
+.overflow-x-scrollbar table {
+  min-width: 900px;
 }

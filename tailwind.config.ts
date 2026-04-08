@@ -25,10 +25,19 @@ const config: Config = {
           800: "var(--accent-color-800)",
         },
       },
+      screens: {
+      xs: "480px",
+      sm: "640px",
+      md: "750px", 
+      lg: "1024px",
+      xl: "1280px",
+    },
     },
   },
-  plugins: [],
-};
+  plugins: [
+  require('tailwind-scrollbar'),
+],
 
+};
 
 export default config;

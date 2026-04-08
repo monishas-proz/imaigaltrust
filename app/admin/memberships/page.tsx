@@ -123,54 +123,58 @@ export default function AdminMembershipsPage() {
   };
 
   return (
-<div className="w-full px-4 sm:px-6 lg:px-8 mx-auto">
+<div className="w-full px-4 md:px-6 lg:px-8 mx-auto">
   <Toaster position="top-right" />
 
   {/* Header */}
-  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-white p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm mb-6 w-full">
+  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 bg-white p-4 md:p-6 rounded-xl border border-gray-100 shadow-sm mb-6 w-full">
     <div>
       <h1 className="text-2xl font-bold text-gray-800">Membership Data</h1>
       <p className="text-sm text-gray-500">View and manage organization members</p>
     </div>
-    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+    <div className="flex flex-col md:flex-row gap-2 md:gap-3 w-full md:w-auto">
       <button
         onClick={handleApprove}
         disabled={selectedMembers.length === 0}
-        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-semibold w-full sm:w-auto"
+        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-semibold w-full md:w-auto"
       >
         Approve
       </button>
       <button
         onClick={() => setRejectPopup(true)}
         disabled={selectedMembers.length === 0}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold w-full sm:w-auto"
+        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold w-full md:w-auto"
       >
         Reject
       </button>
     </div>
   </div>
 
-  {/* Desktop Table */}
-  <div className="hidden sm:block bg-white rounded-2xl shadow border border-gray-100 w-full overflow-x-auto">
-    <table className="min-w-[900px] sm:min-w-full text-left border-collapse text-xs sm:text-sm">
-      <thead className="bg-[#1a4d2e] text-white">
-        <tr>
-          <th className="px-3 py-2">S.No</th>
-          <th className="px-3 py-2">Select</th>
-          <th className="px-3 py-2">Name</th>
-          <th className="px-3 py-2">Contact</th>
-          <th className="px-3 py-2">Location</th>
-          <th className="px-3 py-2">Membership</th>
-          <th className="px-3 py-2">Donation</th>
-          <th className="px-3 py-2">Status</th>
-          <th className="px-3 py-2">Applied Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentData.map((m, i) => (
-          <tr key={m.id} className="border-b hover:bg-gray-50 transition">
-            <td className="px-3 py-2">{startIndex + i + 1}</td>
-            <td className="px-3 py-2">
+  
+{/* Desktop Table */}
+<div className="w-full md:overflow-x-scroll overflow-x-auto">
+      <table className="min-w-[900px] md:min-w-full text-left border-collapse text-[10px] md:text-sm">
+    
+    <thead className="bg-[#1a4d2e] text-white">
+      <tr>
+        <th className="py-2">S.No</th>
+        <th className="py-2">Select</th>
+        <th className="py-2">Name</th>
+        <th className="py-2">Contact</th>
+        <th className="py-2">Location</th>
+        <th className="py-2">Membership</th>
+        <th className="py-2">Donation</th>
+        <th className="py-2">Status</th>
+        <th className="py-2">Applied Date</th>
+        
+      </tr>
+    </thead>
+
+    <tbody>
+      {currentData.map((m, i) => (
+        <tr key={m.id} className="border-b hover:bg-gray-50 transition">
+          <td className="py-2 text-xs">{startIndex + i + 1}</td>
+            <td className=" py-2 text-xs">
               <input
                 type="checkbox"
                 checked={selectedMembers.includes(m.id)}
@@ -183,17 +187,19 @@ export default function AdminMembershipsPage() {
                 className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
               />
             </td>
-            <td className="px-3 py-2">{m.name}</td>
-            <td className="px-3 py-2">
+            <td className=" py-2 text-xs">{m.name}</td>
+            <td className=" py-2 text-xs">
               {m.email} <br />
-              <span className="text-gray-400">{m.mobile}</span>
+              <span className="text-gray-400 text-xs">{m.mobile}</span>
             </td>
-            <td className="px-3 py-2">{m.city}, {m.state}</td>
-            <td className="px-3 py-2">{m.membership_type}</td>
-            <td className="px-3 py-2">{m.voluntaryDonation > 0 ? `₹${m.voluntaryDonation}` : "Free"}</td>
-            <td className="px-3 py-2">
+            <td className="py-2 text-xs">
+  {m.city}, <span className="text-[10px] text-gray-400">{m.state}</span>
+</td>
+            <td className=" py-2 text-xs">{m.membership_type}</td>
+            <td className=" py-2 text-xs">{m.voluntaryDonation > 0 ? `₹${m.voluntaryDonation}` : "Free"}</td>
+            <td className=" py-2">
               <span
-                className={`px-2 py-1 rounded-full text-xs ${
+                className={` py-1 rounded-full text-xs ${
                   m.status === "approved"
                     ? "bg-green-100 text-green-800"
                     : m.status === "rejected"
@@ -204,7 +210,7 @@ export default function AdminMembershipsPage() {
                 {m.status.charAt(0).toUpperCase() + m.status.slice(1)}
               </span>
             </td>
-            <td className="px-3 py-2">{new Date(m.created_at).toLocaleDateString()}</td>
+            <td className=" py-2 text-xs">{new Date(m.created_at).toLocaleDateString()}</td>
           </tr>
         ))}
       </tbody>
@@ -254,6 +260,35 @@ export default function AdminMembershipsPage() {
     ))}
   </div>
 
+
+{/* Reject Popup */}
+{rejectPopup && (
+  <div className="fixed inset-0 flex items-center justify-center  bg-opacity-10 backdrop-blur-sm z-[9999]">
+  <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+      <h2 className="text-lg font-semibold mb-4">Reject Members</h2>
+      <textarea 
+        value={rejectReason}
+        onChange={(e) => setRejectReason(e.target.value)}
+        placeholder="Enter reject reason..."
+        className="w-full border border-gray-300 rounded-md p-2 text-sm mb-4"
+      />
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setRejectPopup(false)}
+          className="px-4 py-2 bg-gray-300 rounded-md text-sm"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleReject}
+          className="px-4 py-2 bg-red-600 text-white rounded-md text-sm"
+        >
+          Confirm Reject
+        </button>
+      </div>
+    </div>
+  </div>
+)}
   {/* Pagination */}
   <Pagination
     currentPage={currentPage}
@@ -263,5 +298,6 @@ export default function AdminMembershipsPage() {
     onPerPageChange={(value) => setPerPage(value)}
   />
 </div>
+
   );
 }
