@@ -74,8 +74,8 @@ const toggleDropdown = (name: string) => {
               >
               <span
   onClick={() => toggleDropdown("about")}
-  className="flex items-center gap-1 cursor-pointer text-white justify-center md:justify-start mr-40 md:ml-4 py-4 md:py-0"
->
+className="flex items-center gap-1 cursor-pointer text-white py-4 md:py-2 ml-8 md:ml-4">
+
   About Us <FaChevronDown />
 </span>
 
@@ -115,9 +115,8 @@ const toggleDropdown = (name: string) => {
               >
            <span
   onClick={() => toggleDropdown("programs")}
-  className="flex items-center gap-1 cursor-pointer text-white justify-center md:justify-start mr-40 md:ml-4 py-4 md:py-0"
->
-  Programs <FaChevronDown />
+className="flex items-center gap-1 cursor-pointer text-white py-4 md:py-2 ml-8 md:ml-4">
+    Programs <FaChevronDown />
 </span>
 
 
@@ -255,7 +254,9 @@ const toggleDropdown = (name: string) => {
                 className={`nav-link ${pathname === "/news-events" ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="/news-events">News & Events</Link>
+                <Link href="/news-events" className="md:-ml-3">
+  News & Events
+</Link>
               </li>
 
               {/* Gallery */}
@@ -263,7 +264,9 @@ const toggleDropdown = (name: string) => {
                 className={`nav-link ${isParentPathActive("/gallery") ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="/gallery">Gallery</Link>
+                <Link href="/gallery " className="md:-ml-3">
+                  Gallery
+                </Link>
               </li>
 
               <li
