@@ -142,88 +142,87 @@ useEffect(() => {
             </div>
           </span>
 
-          <span className="text-sm font-semibold italic accent-text-800 md:text-base">
+          {/* <span className="text-sm font-semibold italic accent-text-800 md:text-base">
             {new Date(event.start_date).toLocaleDateString("en-IN")}
-          </span>
+          </span> */}
 
-        </React.Fragment>
-      ))}
+        {/* </React.Fragment> */}
+     
     </div>
 
   </div>
 </span>
-        </div>
-      </div>
-      {/* VISION AND MISSION CONTAINER */}
-      <div className="p-5 mx-auto max-w-[1600px]">
-        <div className="grid md:grid-cols-2 gap-10 items-center">
-          <div className="grid grid-cols-2 gap-2 grid-rows-2">
-            {/* <div className="flex flex-col justify-center items-center gap-2"> */}
+      
+   
+      // <div className="p-5 mx-auto max-w-[1600px]">
+      //   <div className="grid md:grid-cols-2 gap-10 items-center">
+      //     <div className="grid grid-cols-2 gap-2 grid-rows-2">
+      //       {/* <div className="flex flex-col justify-center items-center gap-2"> */}
 
-            <Image
-              src={"/assets/images/home/mission/woman-with-smile-her.png"}
-              alt="women"
-              width={100}
-              height={100}
-              className="w-full col-span-1 border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
-            />
+      //       <Image
+      //         src={"/assets/images/home/mission/woman-with-smile-her.png"}
+      //         alt="women"
+      //         width={100}
+      //         height={100}
+      //         className="w-full col-span-1 border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
+      //       />
 
-            <Image
-              src={"/assets/images/home/mission/animal.png"}
-              alt="women"  
-              width={100}
-              height={100}
-              className="w-full col-span-1 row-start-2 h-full border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
-            />
+      //       <Image
+      //         src={"/assets/images/home/mission/animal.png"}
+      //         alt="women"  
+      //         width={100}
+      //         height={100}
+      //         className="w-full col-span-1 row-start-2 h-full border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
+      //       />
 
-            <Image
-             src={"/assets/images/home/mission/women-doctor.png"}
-             alt="women"
-             width={100}
-             height={100}
-             className="w-full row-span-2 h-full border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
-            />
-          </div>
-          <div>
-            <Text
-              title="Welcome To Imaigal Trust"
-              size="text-2xl"
-              className="my-2 poppins-font primary-text"
-            />
-            <Text
-              title="Transforming Lives, Empowering Communities"
-              size="text-4xl"
-              className="my-2 uppercase font-semibold accent-text-800"
-            />
-            <span className="poppins-font my-5 block text-sm">
-              Imaigal Trust is a non-profit organization working towards rural
-              transformation through sustainable
-              <span className="font-semibold">
-                {" "}
-                Agriculture, Women’s Empowerment, Rural Health, Environmental
-                Sustainability, and Social Welfare.
-              </span>
-            </span>
-            <div className="grid md:grid-cols-2 gap-2 items-center">
-              <div className="ps-5 border-l-4 border-primary poppins-font">
-                <span className="accent-text-800 text-xl">Our Vision</span>
-                <p className="mt-4">
-                  Empowering lives through education, equality, and sustainable development, while creating opportunities for every individual
-                   to grow with dignity, confidence, and a better future in an inclusive and progressive society.
-                </p>
-              </div>
-              <div className="ps-5 border-l-4 border-primary poppins-font">
-                <span className="accent-text-800 text-xl">Our Mission</span>
-                <p className="mt-4">
-                 To uplift communities by providing education, healthcare, and livelihood opportunities, while fostering social welfare,
-                  inclusive growth, and long-term development for a stronger and self-reliant society.
-                </p>
-              </div>
-            </div>
+      //       <Image
+      //        src={"/assets/images/home/mission/women-doctor.png"}
+      //        alt="women"
+      //        width={100}
+      //        height={100}
+      //        className="w-full row-span-2 h-full border-blue-900 rounded shadow-[0_0_8px_rgba(0,0,0,0.6),0_0_3px_rgba(255,255,255,0.9)]"
+      //       />
+      //     </div>
+      //     <div>
+      //       <Text
+      //         title="Welcome To Imaigal Trust"
+      //         size="text-2xl"
+      //         className="my-2 poppins-font primary-text"
+      //       />
+      //       <Text
+      //         title="Transforming Lives, Empowering Communities"
+      //         size="text-4xl"
+      //         className="my-2 uppercase font-semibold accent-text-800"
+      //       />
+      //       <span className="poppins-font my-5 block text-sm">
+      //         Imaigal Trust is a non-profit organization working towards rural
+      //         transformation through sustainable
+      //         <span className="font-semibold">
+      //           {" "}
+      //           Agriculture, Women’s Empowerment, Rural Health, Environmental
+      //           Sustainability, and Social Welfare.
+      //         </span>
+      //       </span>
+      //       <div className="grid md:grid-cols-2 gap-2 items-center">
+      //         <div className="ps-5 border-l-4 border-primary poppins-font">
+      //           <span className="accent-text-800 text-xl">Our Vision</span>
+      //           <p className="mt-4">
+      //             Empowering lives through education, equality, and sustainable development, while creating opportunities for every individual
+      //              to grow with dignity, confidence, and a better future in an inclusive and progressive society.
+      //           </p>
+      //         </div>
+      //         <div className="ps-5 border-l-4 border-primary poppins-font">
+      //           <span className="accent-text-800 text-xl">Our Mission</span>
+      //           <p className="mt-4">
+      //            To uplift communities by providing education, healthcare, and livelihood opportunities, while fostering social welfare,
+      //             inclusive growth, and long-term development for a stronger and self-reliant society.
+      //           </p>
+      //         </div>
+      //       </div>
             {/* <Button label="Read More " className="mt-5 blue__btn rounded-sm" /> */}
-          </div>
-        </div>
-      </div>
+      //     </div>
+      //   </div>
+      // </div>
       {/* CIRCLE DESIGN */}
       {/* <CircleDesign /> */}
       <Timeline />
