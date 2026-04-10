@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
 
 export async function PATCH(
   request: Request,
@@ -15,22 +14,37 @@ export async function PATCH(
     const body = await request.json();
     const { status, reject_reason } = body;
 
-    const updatedRegistration = await (prisma.eventRegistration as any).update({
-      where: { id: BigInt(resolvedParams.id) },
+    console.log(`Updating registration ${resolvedParams.id} with status ${status}`);
+
+    // @ts-ignore - status exists in DB but Prisma types might be out of sync
+    const updatedRegistration = await prisma.eventRegistration.update({
+      where: { id: parseInt(resolvedParams.id) },
       data: {
         status: parseInt(status.toString()),
         reject_reason: reject_reason || null,
-      },
+      } as any,
     });
+
+    // Helper to serialize BigInt for JSON response
+    const serializeResult = (obj: any) => {
+      return JSON.parse(
+        JSON.stringify(obj, (key, value) =>
+          typeof value === "bigint" ? value.toString() : value
+        )
+      );
+    };
 
     return NextResponse.json({
       message: "Status updated successfully",
-      registration: updatedRegistration,
+      registration: serializeResult(updatedRegistration),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating registration status:", error);
     return NextResponse.json(
-      { message: "Failed to update status" },
+      {
+        message: "Failed to update status",
+        error: error.message
+      },
       { status: 500 }
     );
   }
