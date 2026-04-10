@@ -25,6 +25,30 @@ export async function PATCH(
       } as any,
     });
 
+    try {
+      const parsedStatus = parseInt(status.toString());
+      if (parsedStatus === 1 || parsedStatus === 2) {
+        const eventInfo = await prisma.event.findUnique({
+          where: { id: Number(updatedRegistration.event_id) },
+          select: { title: true }
+        });
+        
+        if (eventInfo?.title && updatedRegistration.email) {
+          const { sendEventApprovalMail, sendEventRejectionMail } = await import("@/lib/sendMail");
+          const applicantName = updatedRegistration.first_name + 
+            (updatedRegistration.last_name ? " " + updatedRegistration.last_name : "");
+            
+          if (parsedStatus === 1) {
+            await sendEventApprovalMail(updatedRegistration.email, applicantName, eventInfo.title);
+          } else if (parsedStatus === 2) {
+            await sendEventRejectionMail(updatedRegistration.email, applicantName, eventInfo.title);
+          }
+        }
+      }
+    } catch (mailError) {
+      console.error("Failed to send status update mail:", mailError);
+    }
+
     // Helper to serialize BigInt for JSON response
     const serializeResult = (obj: any) => {
       return JSON.parse(
