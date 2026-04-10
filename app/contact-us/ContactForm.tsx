@@ -245,9 +245,9 @@ export default function ContactForm() {
                 {submitStatus.message}
               </div>
             )}
-<h2 className="text-sml text-[25px] font-semibold  text-gray-800 mb-4">
+<h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">
   Send Us a Message
-</h2>      
+</h2>     
 
 
           <p className="text-[15px] text-gray-500 mt-1 mb-6">
