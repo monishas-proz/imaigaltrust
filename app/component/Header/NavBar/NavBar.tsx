@@ -7,9 +7,17 @@ import "./NavBar.css";
 import Image from "next/image";
 import { TbHome } from "react-icons/tb";
 
+
+
+// Rest of your Navbar code...
 const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+const toggleDropdown = (name: string) => {
+  setOpenDropdown(openDropdown === name ? null : name);
+};
 
   // Close hamburger menu on route change
   useEffect(() => {
@@ -67,10 +75,14 @@ const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
                 className={`nav-link ${isParentPathActive("/about") ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="#">
-                  About Us <FaChevronDown />
-                </Link>
-                <div className="dropdown">
+              <span
+  onClick={() => toggleDropdown("about")}
+className="flex items-center gap-1 cursor-pointer text-white text-sm py-4 md:py-2 ml-8 md:ml-4">
+
+  About Us <FaChevronDown />
+</span>
+
+                <div className={`dropdown ${openDropdown === "about" ? "show" : ""}`}>
                   <ul>
                     <li
                       className={`dropdown-link ${pathname === "/about/board-members" ? "active" : ""}`}
@@ -104,10 +116,14 @@ const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
                 className={`nav-link ${isParentPathActive("/programs") ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="#">
-                  Programs <FaChevronDown />
-                </Link>
-                <div className="dropdown">
+          <span
+  onClick={() => toggleDropdown("programs")}
+  className="flex items-center gap-1 cursor-pointer text-white text-sm py-4 md:py-2 ml-8 md:ml-4"
+>
+  Programs <FaChevronDown />
+</span>
+
+                <div className={`dropdown ${openDropdown === "programs" ? "show" : ""}`}>
                   <ul>
                     <li
                       className={`dropdown-link ${pathname === "/programs/agriculture" ? "active" : ""}`}
@@ -241,7 +257,9 @@ const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
                 className={`nav-link ${pathname === "/news-events" ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="/news-events">News & Events</Link>
+                <Link href="/news-events" className="nav-title">
+  News & Events
+</Link>
               </li>
 
               {/* Gallery */}
@@ -249,14 +267,18 @@ const Navbar = ({ hideNavItems = false }: { hideNavItems?: boolean }) => {
                 className={`nav-link ${isParentPathActive("/gallery") ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="/gallery">Gallery</Link>
+                <Link href="/gallery" className="nav-title">
+  Gallery
+</Link>
               </li>
 
               <li
                 className={`nav-link ${pathname === "/contact" ? "active" : ""}`}
                 style={{ "--i": ".6s" } as React.CSSProperties}
               >
-                <Link href="/contact-us">Contact Us</Link>
+               <Link href="/contact-us" className="nav-title">
+  Contact Us
+</Link>
               </li>
             </ul>
           </div>

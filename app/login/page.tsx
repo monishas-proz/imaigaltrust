@@ -37,7 +37,7 @@ export default function LoginPage() {
   const [otpSending, setOtpSending] = useState(false);
   const [otpTimer, setOtpTimer] = useState(90); // counts down for OTP validity
   const [resendEnabled, setResendEnabled] = useState(false); // controls resend button
-
+  
 const [resendTimer, setResendTimer] = useState(0); // controls Resend button
 
   const [newPassword, setNewPassword] = useState("");
@@ -145,8 +145,13 @@ useEffect(() => {
     try {
       const res = await fetch("/api/login", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data),
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email: data.email,
+    password: data.password,
+  }),
 });
 const result = await res.json();
 
@@ -230,33 +235,38 @@ const sendOtp = async () => {
 };
 // Submit OTP
 const submitOtp = async () => {
-  if (!otp) return toast.error("Enter OTP");
+  if (!otp || otp.length !== 6) {
+    return toast.error("Enter valid 6-digit OTP");
+  }
 
   setOtpVerifying(true);
 
   try {
     const res = await fetch("/api/verify-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: forgotEmail, otp }),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email: forgotEmail,
+    otp: otp,
+  }),
+});
 
     const data = await res.json();
 
     if (!res.ok) {
-      setOtpVerifying(false);
-      return toast.error(data.message || "Invalid OTP");
+      toast.error(data.message || "Invalid OTP");
+      return;
     }
 
-    // OTP verified successfully
-    toast.success(data.message || "OTP verified successfully!");
-
+    toast.success("OTP verified");
     setShowOtpModal(false);
-    setShowResetModal(true); // show reset password modal
+    setShowResetModal(true);
 
-  } catch (err) {
-    console.error(err);
-    toast.error("Server error, try again later");
+  } catch (error) {
+    console.error(error);
+    toast.error("Server error");
   } finally {
     setOtpVerifying(false);
   }
@@ -270,11 +280,11 @@ const submitOtp = async () => {
           <div className="bg-gradient-to-br from-[#166534] via-[#15803d] to-[#14532D] p-6 text-center relative">
             <div className="relative z-10 flex justify-center mb-3">
               <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-xl rotate-[8deg] hover:rotate-0 transition-all duration-500">
-                <FaUserShield className="text-2xl text-[#166534]" />
+                <FaUserShield className="text-[#166534] text-xl" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-1">Welcome Back</h2>
-            <p className="text-green-50 text-xs font-medium">Sign in to your account</p>
+            <h2 className="font-bold text-white mb-1 text-xl">Welcome Back</h2>
+            <p className="text-green-50 font-medium text-xs">Sign in to your account</p>
           </div>
 
           {/* Form */}
@@ -282,7 +292,7 @@ const submitOtp = async () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email */}
               <div>
-                <label className="text-sm font-semibold text-gray-700 ml-1">
+                <label className="font-semibold text-gray-700 ml-1 text-xs">
                   Email Address
                 </label>
                 <div className="relative mt-1">
@@ -299,7 +309,7 @@ const submitOtp = async () => {
 
               {/* Password */}
               <div>
-                <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                <label className="font-semibold text-gray-700 ml-1 text-xs">Password</label>
                 <div className="relative mt-1">
                   <FaLock className="absolute left-4 top-4 text-gray-400" />
                   <input
@@ -323,7 +333,7 @@ const submitOtp = async () => {
                 <button
                   type="button"
                   onClick={() => setShowForgotModal(true)}
-                  className="text-xs font-semibold text-[#166534]"
+                  className="font-semibold text-[#166534] text-xs"
                 >
                   Forgot Password?
                 </button>
@@ -358,15 +368,15 @@ const submitOtp = async () => {
 
       {/* Header */}
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Reset Password</h2>
-        <p className="text-gray-500 text-sm mt-2">
+        <h2 className="font-bold text-gray-800 text-xl">Reset Password</h2>
+        <p className="text-gray-500 mt-2 text-xs">
           Enter your registered email to receive an OTP.
         </p>
       </div>
 
       {/* Email Field */}
       <div className="mb-5">
-        <label className="block text-sm font-medium text-gray-600 mb-2">
+        <label className="block font-medium text-gray-600 mb-2 text-xs">
           Email Address
         </label>
         <div>
@@ -384,7 +394,7 @@ const submitOtp = async () => {
             }`}
           />
           {forgotEmailError && (
-            <p className="text-red-500 text-sm mt-1">{forgotEmailError}</p>
+            <p className="text-red-500 mt-1 text-xs">{forgotEmailError}</p>
           )}
         </div>
       </div>
@@ -419,7 +429,7 @@ const submitOtp = async () => {
         ✕
       </button>
 
-      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">
+      <h2 className="font-semibold text-center text-gray-800 mb-4 text-xl">
         Enter OTP
       </h2>
 
@@ -433,9 +443,9 @@ const submitOtp = async () => {
             value={otp[i] || ""}
             onChange={(e) => {
               const value = e.target.value.replace(/\D/, "");
-              const newOtp = otp.split("");
-              newOtp[i] = value;
-              setOtp(newOtp.join(""));
+             const newOtp = otp.split("");
+newOtp[i] = value;
+setOtp(newOtp.join(""));
               const next = e.currentTarget.nextElementSibling as HTMLInputElement | null;
               if (value && next) next.focus();
             }}
@@ -443,13 +453,13 @@ const submitOtp = async () => {
               const prev = e.currentTarget.previousElementSibling as HTMLInputElement | null;
               if (e.key === "Backspace" && !otp[i] && prev) prev.focus();
             }}
-            className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg outline-none focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/30 transition"
+            className="w-12 h-12 text-center font-semibold border border-gray-300 rounded-lg outline-none focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/30 transition text-base"
           />
         ))}
       </div>
 
       {/* OTP Timer */}
-      <p className="text-center text-sm text-gray-500 mb-3">
+      <p className="text-center text-gray-500 mb-3 text-xs">
   OTP valid for {Math.floor(otpTimer / 60).toString().padStart(2, "0")}:
   {(otpTimer % 60).toString().padStart(2, "0")}
 </p>
@@ -495,7 +505,7 @@ const submitOtp = async () => {
       setShowOtpModal(false);
       setShowForgotModal(true);
     }}
-    className="flex items-center justify-center gap-2 text-sm text-black hover:text-[#166534] font-medium mx-auto"
+    className="flex items-center justify-center gap-2 text-black hover:text-[#166534] font-medium mx-auto text-xs"
   >
     <FaArrowLeft className="text-xs" />
     Change Email / Back
@@ -517,8 +527,8 @@ const submitOtp = async () => {
             </button>
 
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">Reset Password</h2>
-        <p className="text-sm text-gray-500 mt-1">
+              <h2 className="font-semibold text-gray-800 text-xl">Reset Password</h2>
+        <p className="text-gray-500 mt-1 text-xs">
           Create a new secure password for your account
         </p>
             </div>
@@ -608,7 +618,7 @@ const submitOtp = async () => {
         ✕
       </button>
 
-      <h2 className="text-xl font-bold text-center mb-2">Reset Password</h2>
+      <h2 className="font-bold text-center mb-2 text-lg">Reset Password</h2>
 
       <input
         type="password"

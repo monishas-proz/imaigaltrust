@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "@/app/component/Pagination/Pagination";
 import toast, { Toaster } from "react-hot-toast";
+
 interface Membership {
-  id: number;
+  id: string;
   name: string;
   email: string;
   mobile: string;
@@ -17,7 +18,7 @@ interface Membership {
 }
 
 interface RawMembership {
-  id: number;
+  id: string;
   name: string;
   email: string;
   mobile: string;
@@ -32,27 +33,25 @@ interface RawMembership {
 export default function AdminMembershipsPage() {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [rejectPopup, setRejectPopup] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
-const [rejectPopup, setRejectPopup] = useState(false);
-const [rejectReason, setRejectReason] = useState("");
-
-//use effect to fetch data
   useEffect(() => {
     async function fetchMemberships() {
       try {
         const response = await fetch("/api/membership");
         const data = await response.json();
-
-       const enrichedData: Membership[] = (data.memberships || []).map((m: RawMembership) => ({
-  ...m,
-  voluntaryDonation: Number(m.voluntaryDonation) || 0,
-status: m.status || "pending",}));
-
+        const enrichedData: Membership[] = (data.memberships || []).map(
+          (m: RawMembership) => ({
+            ...m,
+            voluntaryDonation: Number(m.voluntaryDonation) || 0,
+            status: m.status || "pending",
+          })
+        );
         setMemberships(enrichedData);
       } catch (error) {
         console.error("Failed to fetch memberships:", error);
@@ -60,311 +59,269 @@ status: m.status || "pending",}));
         setLoading(false);
       }
     }
-
     fetchMemberships();
   }, []);
 
-  const totalItems = memberships.length;
+  const filteredMemberships = memberships.filter((m) =>
+    statusFilter === "all" ? true : m.status === statusFilter
+  );
+
+  const totalItems = filteredMemberships.length;
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
-  const currentData = memberships.slice(startIndex, endIndex);
+  const currentData = filteredMemberships.slice(startIndex, endIndex);
 
-//approeve
- const handleApprove = async () => {
-  if (selectedMembers.length === 0) {
-    toast.error("Please select at least one member to approve");
-    return;
-  }
+  // Approve members
+  const handleApprove = async () => {
+    if (selectedMembers.length === 0) {
+      toast.error("Please select at least one member to approve");
+      return;
+    }
+    try {
+      await fetch("/api/membership/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedMembers, status: 1 }),
+      });
+      setMemberships((prev) =>
+        prev.map((m) =>
+          selectedMembers.includes(m.id) ? { ...m, status: "approved" } : m
+        )
+      );
+      toast.success("Selected member(s) approved successfully!");
+      setSelectedMembers([]);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to approve members");
+    }
+  };
 
-  try {
-    await fetch("/api/membership/update-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ids: selectedMembers,
-        status: "approved",
-      }),
-    });
+  // Reject members
+  const handleReject = async () => {
+    if (!rejectReason.trim()) {
+      toast.error("Reject reason is mandatory");
+      return;
+    }
+    try {
+      await fetch("/api/membership/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ids: selectedMembers,
+          status: 2,
+          reason: rejectReason,
+        }),
+      });
+      setMemberships((prev) =>
+        prev.map((m) =>
+          selectedMembers.includes(m.id) ? { ...m, status: "rejected" } : m
+        )
+      );
+      toast.success("Selected member(s) rejected successfully!");
+      setRejectPopup(false);
+      setRejectReason("");
+      setSelectedMembers([]);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to reject members");
+    }
+  };
 
-    setMemberships((prev) =>
-      prev.map((member) =>
-        selectedMembers.includes(member.id)
-          ? { ...member, status: "approved" }
-          : member
-      )
-    );
-
-    toast.success("Selected member(s) approved successfully!"); 
-
-    setSelectedMembers([]);
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to approve members");
-  }
-};
-
-//reject 
-const handleReject = async () => {
-  if (!rejectReason.trim()) {
-    toast.error("Reject reason is mandatory"); 
-    return;
-  }
-
-  try {
-    await fetch("/api/membership/update-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ids: selectedMembers,
-        status: "rejected",
-        reason: rejectReason,
-      }),
-    });
-
-    setMemberships((prev) =>
-      prev.map((member) =>
-        selectedMembers.includes(member.id)
-          ? { ...member, status: "rejected" }
-          : member
-      )
-    );
-
-    toast.success("Selected member(s) rejected successfully!"); 
-
-    setRejectPopup(false);
-    setRejectReason("");
-    setSelectedMembers([]);
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to reject members"); 
-  }
-};
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <Toaster position="top-right" />
+<div className="w-full px-4 md:px-6 lg:px-8 mx-auto">
+  <Toaster position="top-right" />
 
-      {/* Header + Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Membership Data</h1>
-          <p className="text-sm text-gray-500">
-            View and manage organization members
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-          <button
-            onClick={handleApprove}
-            disabled={selectedMembers.length === 0}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-semibold w-full sm:w-auto"
-          >
-            Approve
-          </button>
-          <button
-            onClick={() => setRejectPopup(true)}
-            disabled={selectedMembers.length === 0}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold w-full sm:w-auto"
-          >
-            Reject
-          </button>
-        </div>
-      </div>
+  {/* Header */}
+  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 bg-white p-4 md:p-6 rounded-xl border border-gray-100 shadow-sm mb-6 w-full">
+    <div>
+      <h1 className="font-bold text-gray-800 text-xl">Membership Data</h1>
+      <p className="text-gray-500 text-xs">View and manage organization members</p>
+    </div>
+    <div className="flex flex-col md:flex-row gap-2 md:gap-3 w-full md:w-auto">
+      <select
+        value={statusFilter}
+        onChange={(e) => {
+          setStatusFilter(e.target.value);
+          setCurrentPage(1);
+        }}
+        className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+      >
+        <option value="all">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <button
+        onClick={handleApprove}
+        disabled={selectedMembers.length === 0}
+        className="px-4 py-2 bg-green-900 text-white rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed font-semibold w-full md:w-auto text-xs transition-all"
+      >
+        Approve
+      </button>
+      <button
+        onClick={() => setRejectPopup(true)}
+        disabled={selectedMembers.length === 0}
+        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold w-full md:w-auto text-xs transition-all"
+      >
+        Reject
+      </button>
+    </div>
+  </div>
 
-      {loading ? (
-        <div className="flex justify-center py-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a4d2e]"></div>
-        </div>
-      ) : (
-        <>
-          {/* Desktop Table */}
-          <div className="hidden sm:block bg-white rounded-2xl shadow overflow-x-auto border border-gray-100">
-            <table className="min-w-full text-left border-collapse text-xs sm:text-sm">
-              <thead className="bg-[#1a4d2e] text-white">
-                <tr>
-                  <th className="px-3 py-2">S.No</th>
-                  <th className="px-3 py-2">Select</th>
-                  <th className="px-3 py-2">Name</th>
-                  <th className="px-3 py-2">Contact</th>
-                  <th className="px-3 py-2">Location</th>
-                  <th className="px-3 py-2">Membership</th>
-                  <th className="px-3 py-2">Donation</th>
-                  <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2">Applied Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentData.map((member, index) => (
-                  <tr
-                    key={member.id}
-                    className="border-b hover:bg-gray-50 transition"
-                  >
-                    <td className="px-3 py-2">{startIndex + index + 1}</td>
-                    <td className="px-3 py-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedMembers.includes(member.id)}
-                        onChange={(e) =>
-                          e.target.checked
-                            ? setSelectedMembers([...selectedMembers, member.id])
-                            : setSelectedMembers(
-                                selectedMembers.filter((id) => id !== member.id)
-                              )
-                        }
-                        disabled={member.status !== "pending"}
-                        className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                      />
-                    </td>
-                    <td className="px-3 py-2">{member.name}</td>
-                    <td className="px-3 py-2">
-                      {member.email} <br />
-                      <span className="text-gray-400">{member.mobile}</span>
-                    </td>
-                    <td className="px-3 py-2">
-                      {member.city}, {member.state}
-                    </td>
-                    <td className="px-3 py-2">{member.membership_type}</td>
-                    <td className="px-3 py-2">
-                      {member.voluntaryDonation > 0
-                        ? `₹${member.voluntaryDonation}`
-                        : "Free"}
-                    </td>
-                    <td className="px-3 py-2">
-                      {member.status === "approved" && (
-                        <span className="bg-green-900 text-white px-2 py-1 rounded-full text-xs">
-                          Approved
-                        </span>
-                      )}
-                      {member.status === "pending" && (
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
-                          Pending
-                        </span>
-                      )}
-                      {member.status === "rejected" && (
-                        <span className="bg-red-800 text-white px-2 py-1 rounded-full text-xs">
-                          Rejected
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2">
-                      {new Date(member.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  
+{/* Desktop Table */}
+<div className="w-full md:overflow-x-scroll overflow-x-auto">
+      <table className="min-w-[900px] md:min-w-full text-left border-collapse text-xs">
+    
+    <thead className="bg-[#1a4d2e] text-white">
+      <tr>
+        <th className="py-2">S.No</th>
+        <th className="py-2">Select</th>
+        <th className="py-2">Name</th>
+        <th className="py-2">Contact</th>
+        <th className="py-2">Location</th>
+        <th className="py-2">Membership</th>
+        <th className="py-2">Donation</th>
+        <th className="py-2">Status</th>
+        <th className="py-2">Applied Date</th>
+        
+      </tr>
+    </thead>
 
-          {/* Mobile Cards */}
-          <div className="sm:hidden space-y-4">
-            {currentData.map((member) => (
-              <div
-                key={member.id}
-                className="bg-white p-4 rounded-xl shadow border border-gray-100"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold text-sm">{member.name}</h3>
-                    <p className="text-xs text-gray-400">
-                      {member.email} | {member.mobile}
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={selectedMembers.includes(member.id)}
-                    onChange={(e) =>
-                      e.target.checked
-                        ? setSelectedMembers([...selectedMembers, member.id])
-                        : setSelectedMembers(
-                            selectedMembers.filter((id) => id !== member.id)
-                          )
-                    }
-                    disabled={member.status !== "pending"}
-                    className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                </div>
-                <p className="text-xs mt-1">
-                  Location: {member.city}, {member.state}
-                </p>
-                <p className="text-xs mt-1">
-                  Membership: {member.membership_type}
-                </p>
-                <p className="text-xs mt-1">
-                  Donation: {member.voluntaryDonation > 0
-                    ? `₹${member.voluntaryDonation}`
-                    : "Free"}
-                </p>
-                <p className="text-xs mt-1">
-                  Status:{" "}
-                  {member.status === "approved" ? (
-                    <span className="bg-green-900 text-white px-2 py-1 rounded-full text-xs">
-                      Approved
-                    </span>
-                  ) : member.status === "pending" ? (
-                    <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
-                      Pending
-                    </span>
-                  ) : (
-                    <span className="bg-red-800 text-white px-2 py-1 rounded-full text-xs">
-                      Rejected
-                    </span>
-                  )}
-                </p>
-                <p className="text-xs mt-1">
-                  Applied: {new Date(member.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalItems}
-            defaultPerPage={perPage}
-            onPageChange={(page) => setCurrentPage(page)}
-            onPerPageChange={(value) => setPerPage(value)}
-          />
-        </>
-      )}
-
-      {/* Reject Popup */}
-      {rejectPopup && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[90%] max-w-sm">
-            <h2 className="text-lg font-bold mb-3">Reject Reason</h2>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Enter rejection reason..."
-              className="w-full border p-2 rounded-lg mb-4"
-              required
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setRejectPopup(false)}
-                className="px-4 py-2 bg-gray-200 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReject}
-                disabled={!rejectReason.trim()}
-                className={`px-4 py-2 text-white rounded-lg ${
-                  rejectReason.trim()
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "bg-red-300 cursor-not-allowed"
+    <tbody>
+      {currentData.map((m, i) => (
+        <tr key={m.id} className="border-b hover:bg-gray-50 transition">
+          <td className="py-2 text-xs">{startIndex + i + 1}</td>
+            <td className="py-2 text-xs">
+              {m.status === "pending" && (
+                <input
+                  type="checkbox"
+                  checked={selectedMembers.includes(m.id)}
+                  onChange={(e) =>
+                    e.target.checked
+                      ? setSelectedMembers([...selectedMembers, m.id])
+                      : setSelectedMembers(selectedMembers.filter((id) => id !== m.id))
+                  }
+                  className="w-4 h-4 cursor-pointer"
+                />
+              )}
+            </td>
+            <td className="py-2 text-xs">{m.name}</td>
+            <td className="py-2 text-xs">
+              {m.email} <br />
+              <span className="text-gray-400 text-xs">{m.mobile}</span>
+            </td>
+            <td className="py-2 text-xs">
+  {m.city}, <span className="text-gray-400 text-xs">{m.state}</span>
+</td>
+            <td className="py-2 text-xs">{m.membership_type}</td>
+            <td className="py-2 text-xs">{m.voluntaryDonation > 0 ? `₹${m.voluntaryDonation}` : "Free"}</td>
+            <td className="py-2 text-left">
+              <span
+                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  m.status === "approved"
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : m.status === "rejected"
+                    ? "bg-red-100 text-red-700 border border-red-200"
+                    : "bg-yellow-100 text-yellow-700 border border-yellow-200"
                 }`}
               >
-                Reject
-              </button>
-            </div>
+                {m.status}
+              </span>
+            </td>
+            <td className="py-2 text-xs">
+              {new Date(m.created_at).toLocaleDateString("en-GB").replace(/\//g, "-")}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {/* Mobile Cards */}
+  <div className="sm:hidden space-y-4">
+    {currentData.map((m) => (
+      <div key={m.id} className="bg-white p-4 rounded-xl shadow border border-gray-100 w-full">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-semibold text-xs">{m.name}</h3>
+            <p className="text-gray-400 text-xs">{m.email} | {m.mobile}</p>
           </div>
+          {m.status === "pending" && (
+            <input
+              type="checkbox"
+              checked={selectedMembers.includes(m.id)}
+              onChange={(e) =>
+                e.target.checked
+                  ? setSelectedMembers([...selectedMembers, m.id])
+                  : setSelectedMembers(selectedMembers.filter((id) => id !== m.id))
+              }
+              className="w-4 h-4 cursor-pointer"
+            />
+          )}
         </div>
-      )}
+        <p className="mt-1 text-xs">Location: {m.city}, {m.state}</p>
+        <p className="mt-1 text-xs">Membership: {m.membership_type}</p>
+        <p className="mt-1 text-xs">Donation: {m.voluntaryDonation > 0 ? `₹${m.voluntaryDonation}` : "Free"}</p>
+        <p className="mt-1 text-xs">
+          Status:{" "}
+          <span
+            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+              m.status === "approved"
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : m.status === "rejected"
+                ? "bg-red-100 text-red-700 border border-red-200"
+                : "bg-yellow-100 text-yellow-700 border border-yellow-200"
+            }`}
+          >
+            {m.status}
+          </span>
+        </p>
+        <p className="mt-1 text-xs">
+          Applied: {new Date(m.created_at).toLocaleDateString("en-GB").replace(/\//g, "-")}
+        </p>
+      </div>
+    ))}
+  </div>
+
+
+{/* Reject Popup */}
+{rejectPopup && (
+  <div className="fixed inset-0 flex items-center justify-center bg-opacity-10 backdrop-blur-sm z-[9999]">
+  <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+      <h2 className="font-semibold mb-4 text-base">Reject Members</h2>
+      <textarea 
+        value={rejectReason}
+        onChange={(e) => setRejectReason(e.target.value)}
+        placeholder="Enter reject reason..."
+        className="w-full border border-gray-300 rounded-md p-2 mb-4 text-xs"
+      />
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setRejectPopup(false)}
+          className="px-4 py-2 bg-gray-300 rounded-md text-xs"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleReject}
+          className="px-4 py-2 bg-red-600 text-white rounded-md text-xs"
+        >
+          Confirm Reject
+        </button>
+      </div>
     </div>
-       
+  </div>
+)}
+  {/* Pagination */}
+  <Pagination
+    currentPage={currentPage}
+    totalItems={totalItems}
+    defaultPerPage={perPage}
+    onPageChange={(page) => setCurrentPage(page)}
+    onPerPageChange={(value) => setPerPage(value)}
+  />
+</div>
+
   );
 }
