@@ -153,17 +153,16 @@ export default function Home() {
 
     <div>
       <Text
-        title="Welcome To Imaigal Trust"
-        size="text-xl"
-        className="my-2 poppins-font primary-text"
-      />
+  title="Welcome To Imaigal Trust"
+  size="text-sml md:text-xl"
+  className="my-2 poppins-font primary-text"
+/>
 
       <Text
-        title="Transforming Lives, Empowering
-        Communities"
-        size="text-2xl"
-        className="  my-2 leading-[1.2] uppercase font-semibold accent-text-800 "
-      />
+  title="Transforming Lives, Empowering Communities"
+  size="text-base sm:text-lg md:text-xl lg:text-2xl"
+  className="my-2 leading-[1.2] uppercase font-semibold accent-text-800"
+/>
 
       <span className="poppins-font text-sm  my-5 block">
         Imaigal Trust is a non-profit organization working towards rural
@@ -177,7 +176,9 @@ export default function Home() {
 
       <div className="grid md:grid-cols-2 gap-2 items-center">
         <div className="ps-5 border-l-4 border-primary poppins-font">
-          <span className="text-xl accent-text-800">Our Vision</span>
+          <span className="text-sml sm:text-base md:text-lg lg:text-xl accent-text-800">
+  Our Vision
+</span>
           <p className="mt-4 text-sm">
             Empowering lives through education, equality, and sustainable development, 
             while creating opportunities for every individual to grow with dignity, 
@@ -186,7 +187,7 @@ export default function Home() {
         </div>
 
         <div className="ps-5 border-l-4 border-primary poppins-font">
-          <span className="text-xl accent-text-800">Our Mission</span>
+          <span className="text-sml sm:text-base md:text-lg lg:text-xl accent-text-800">Our Mission</span>
           <p className="mt-4 text-sm">
             To uplift communities by providing education, healthcare, and livelihood 
             opportunities, while fostering social welfare, inclusive growth, and 
@@ -207,9 +208,12 @@ export default function Home() {
 
 {/* SUCCESS STORY */}
       <div className="rounded-xl py-1 px-1 md:px-10 max-w-[1700px] mx-auto">
- <div className="text-center mb-1">
-          <SectionHeading title="Success Story" />
-        </div>
+       <div className="text-center mb-1">
+  <SectionHeading
+    title="Success Story"
+    className="text-lg sm:text-xl md:text-2xl lg:text-3xl"
+  />
+</div>
         <div className="flex flex-col lg:flex-row items-center gap-10">
 
     {/* LEFT CONTENT */}
