@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef } from "react";
 import { states } from "@/app/content/StateList";
 import { toast } from "react-hot-toast";
